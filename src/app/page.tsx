@@ -1,6 +1,6 @@
 "use client"
 
-import { Building2, Hammer, Home, Paintbrush, Quote } from "lucide-react"
+import { Hammer, Home, Paintbrush, Quote } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -22,7 +22,7 @@ export default function HomePage() {
               menuLinks={[
                 { link: "/", titulo: "Início", icon: <Home size={18} /> },
                 { link: "/projetos", titulo: "Projetos", icon: <Hammer size={18} /> },
-                { link: "/servicos", titulo: "Serviços", icon: <Paintbrush size={18} /> },
+                { link: "/servicos", titulo: `Serviços`, icon: <Paintbrush size={18} /> },
                 { link: "/contato", titulo: "Contato", icon: <Quote size={18} /> },
               ]}
             />
@@ -158,11 +158,11 @@ export default function HomePage() {
                 </h3>
                 <p className="text-gray-600 text-sm">
                   {tipo === "Residencial" &&
-                    "Este projeto residencial exemplifica nosso compromisso com ambientes acolhedores, funcionais e esteticamente refinados. A imagem apresentada é ilustrativa e busca transmitir o padrão de qualidade e atenção aos detalhes que aplicamos em cada lar construído."}
+                    `Este projeto residencial exemplifica nosso compromisso com ambientes acolhedores, funcionais e esteticamente refinados. A imagem apresentada é ilustrativa e busca transmitir o padrão de qualidade e atenção aos detalhes que aplicamos em cada lar construído.`}
                   {tipo === "Comercial" &&
-                    "O projeto comercial reflete soluções inteligentes voltadas à eficiência operacional e à valorização da marca no espaço físico. A imagem tem caráter ilustrativo e representa o estilo e os acabamentos que podem ser adaptados conforme as necessidades de cada cliente."}
+                    `O projeto comercial reflete soluções inteligentes voltadas à eficiência operacional e à valorização da marca no espaço físico. A imagem tem caráter ilustrativo e representa o estilo e os acabamentos que podem ser adaptados conforme as necessidades de cada cliente.`}
                   {tipo === "Industrial" &&
-                    "Este projeto industrial demonstra nossa capacidade de desenvolver estruturas robustas, seguras e otimizadas para processos produtivos. A imagem é meramente ilustrativa, servindo como referência visual para o padrão técnico e construtivo que oferecemos."}
+                    `Este projeto industrial demonstra nossa capacidade de desenvolver estruturas robustas, seguras e otimizadas para processos produtivos. A imagem é meramente ilustrativa, servindo como referência visual para o padrão técnico e construtivo que oferecemos.`}
                 </p>
               </div>
             </motion.div>
@@ -213,7 +213,7 @@ export default function HomePage() {
                 }}
               >
                 <Quote className="h-8 w-8 mx-auto mb-4 text-yellow-200" />
-                <p className="italic mb-4">"{msg}"</p>
+                <p className="italic mb-4">{`"${msg}"`}</p>
                 <span className="font-semibold block">{nome}</span>
                 <span className="text-sm text-yellow-200">
                   Projeto {projeto} – {data}
