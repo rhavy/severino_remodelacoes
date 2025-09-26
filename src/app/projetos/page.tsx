@@ -1,84 +1,81 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence, PanInfo } from "framer-motion"
-import Image from "next/image"
-import Link from "next/link"
-import { Menu } from "@/comonents/template/menu/page"
-import { Footer } from "@/comonents/template/footer/page"
-import { Home, Hammer, Paintbrush, Quote, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { Menu } from "@/components/template/menu/page";
+import { Footer } from "@/components/template/footer/page";
+import { Home, Hammer, Paintbrush, Quote, X, ChevronLeft, ChevronRight } from "lucide-react";
+
+type ItemGaleria = {
+  id: string;
+  url: string;
+  categoria: string;
+  oculta?: boolean;
+};
 
 export default function ProjetosPage() {
-  const projetos = [
-    {
-      slug: "residencial",
-      tipo: "Residencial",
-      titulo: "Condomínio Residencial Moderno",
-      desc: "Projeto residencial exemplifica nosso compromisso com ambientes acolhedores, funcionais e esteticamente refinados.",
-      imagens: Array.from({ length: 12 }, (_, i) => `/image/projeto-residencial-${(i % 5) + 1}.jpeg`)
-    },
-    {
-      slug: "comercial",
-      tipo: "Comercial",
-      titulo: "Edifício Comercial Inteligente",
-      desc: "O projeto comercial reflete soluções inteligentes voltadas à eficiência operacional e à valorização da marca.",
-      imagens: Array.from({ length: 12 }, (_, i) => `/image/projeto-comercial-${(i % 5) + 1}.jpeg`)
-    },
-    {
-      slug: "industrial",
-      tipo: "Industrial",
-      titulo: "Galpão Industrial Robusto",
-      desc: "Projeto industrial demonstra nossa capacidade de desenvolver estruturas seguras e otimizadas para processos produtivos.",
-      imagens: Array.from({ length: 12 }, (_, i) => `/image/projeto-industrial-${(i % 5) + 1}.jpeg`)
-    },
-  ]
+  const [galeria, setGaleria] = useState<ItemGaleria[]>([]);
+  const [loadedImages, setLoadedImages] = useState<{ [key: string]: number }>({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentCategoria, setCurrentCategoria] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const [currentProject, setCurrentProject] = useState<number | null>(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [loadedImages, setLoadedImages] = useState<{ [key: string]: number }>({})
+  // Buscar galeria
+  useEffect(() => {
+    fetch("/api/galeria")
+      .then((res) => res.json())
+      .then((data: ItemGaleria[]) => {
+        const visibles = data.filter((item) => !item.oculta);
+        setGaleria(visibles);
+      })
+      .catch((err) => console.error("Erro ao buscar galeria:", err));
+  }, []);
 
-  const openModal = (projectIndex: number, imageIndex: number) => {
-    setCurrentProject(projectIndex)
-    setCurrentImageIndex(imageIndex)
-    setModalOpen(true)
-  }
+  // Agrupar por categoria
+  const categorias = Array.from(new Set(galeria.map((item) => item.categoria)));
 
-  const closeModal = () => setModalOpen(false)
+  const openModal = (categoria: string, index: number) => {
+    setCurrentCategoria(categoria);
+    setCurrentImageIndex(index);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => setModalOpen(false);
 
   const nextImage = () => {
-    if (currentProject === null) return
-    const images = projetos[currentProject].imagens
-    setCurrentImageIndex((currentImageIndex + 1) % images.length)
-  }
+    if (!currentCategoria) return;
+    const items = galeria.filter((item) => item.categoria === currentCategoria);
+    setCurrentImageIndex((currentImageIndex + 1) % items.length);
+  };
 
   const prevImage = () => {
-    if (currentProject === null) return
-    const images = projetos[currentProject].imagens
-    setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length)
-  }
+    if (!currentCategoria) return;
+    const items = galeria.filter((item) => item.categoria === currentCategoria);
+    setCurrentImageIndex((currentImageIndex - 1 + items.length) % items.length);
+  };
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 100
-    if (info.offset.x > threshold) prevImage()
-    else if (info.offset.x < -threshold) nextImage()
-  }
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    const threshold = 100;
+    if (info.offset.x > threshold) prevImage();
+    else if (info.offset.x < -threshold) nextImage();
+  };
 
-  // Infinite scroll loader
-  const loadMoreImages = (slug: string) => {
-    setLoadedImages(prev => ({
+  const loadMoreImages = (categoria: string) => {
+    setLoadedImages((prev) => ({
       ...prev,
-      [slug]: (prev[slug] || 6) + 3 // carrega 3 imagens adicionais por vez
-    }))
-  }
+      [categoria]: (prev[categoria] || 6) + 3,
+    }));
+  };
 
   return (
     <main className="flex flex-col flex-1">
-      {/* Header fixo */}
-      <header className="w-full bg-gray-900 shadow-md">
+      {/* Header */}
+      <header className="w-full shadow-md">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
           <nav
-            className="px-6 py-4 flex items-center justify-between w-full mx-auto gap-6 fixed top-0 left-0 right-0 bg-white dark:bg-slate-900 shadow z-50"
+            className="px-6 py-4 flex items-center justify-between w-full mx-auto gap-6 fixed top-0 left-0 right-0 bg-white shadow z-50"
             role="navigation"
           >
             <Menu
@@ -115,38 +112,38 @@ export default function ProjetosPage() {
         </Link>
       </motion.section>
 
-      {/* Grid de Projetos com mini-galeria e botão "Ver Mais" */}
+      {/* Grid de Projetos */}
       <section className="container mx-auto px-6 py-20 space-y-20">
-        {projetos.map((proj, projectIndex) => {
-          const visibleCount = loadedImages[proj.slug] || 6
-          const visibleImages = proj.imagens.slice(0, visibleCount)
+        {categorias.map((categoria) => {
+          const items = galeria.filter((item) => item.categoria === categoria);
+          const visibleCount = loadedImages[categoria] || 6;
+          const visibleItems = items.slice(0, visibleCount);
 
           return (
             <motion.div
-              key={proj.tipo}
+              key={categoria}
               className="space-y-6"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: projectIndex * 0.2 }}
+              transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-400 mb-4">{proj.titulo}</h2>
-              <p className="text-gray-300 mb-6">{proj.desc}</p>
+              <h2 className="text-3xl font-bold text-yellow-600 mb-4">{categoria}</h2>
 
               <div className="columns-1 sm:columns-2 md:columns-3 gap-4">
-                {visibleImages.map((img, i) => (
+                {visibleItems.map((item, i) => (
                   <motion.div
-                    key={i}
+                    key={item.id}
                     className="mb-4 break-inside-avoid rounded-xl overflow-hidden shadow-lg cursor-pointer"
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: i * 0.05 }}
                     viewport={{ once: true }}
-                    onClick={() => openModal(projectIndex, i)}
+                    onClick={() => openModal(categoria, i)}
                   >
                     <Image
-                      src={img}
-                      alt={`${proj.titulo} ${i + 1}`}
+                      src={item.url}
+                      alt={`${categoria} ${i + 1}`}
                       width={400}
                       height={300}
                       className="object-cover w-full rounded-xl shadow-md"
@@ -155,10 +152,10 @@ export default function ProjetosPage() {
                 ))}
               </div>
 
-              {visibleCount < proj.imagens.length && (
+              {visibleCount < items.length && (
                 <div className="text-center mt-4">
                   <button
-                    onClick={() => loadMoreImages(proj.slug)}
+                    onClick={() => loadMoreImages(categoria)}
                     className="inline-block rounded-lg bg-yellow-500 px-6 py-3 text-white font-medium hover:bg-yellow-600 transition"
                   >
                     Ver Mais
@@ -166,13 +163,13 @@ export default function ProjetosPage() {
                 </div>
               )}
             </motion.div>
-          )
+          );
         })}
       </section>
 
       {/* Modal de imagens */}
       <AnimatePresence>
-        {modalOpen && currentProject !== null && (
+        {modalOpen && currentCategoria && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
             initial={{ opacity: 0 }}
@@ -188,27 +185,29 @@ export default function ProjetosPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                className="absolute top-4 right-4 text-white text-3xl"
+                className="absolute top-4 right-4 text-white text-3xl hover:text-yellow-400 transition"
                 onClick={closeModal}
               >
                 <X size={32} />
               </button>
 
               <button
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-white text-4xl p-2"
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-white text-4xl p-2 hover:text-yellow-400 transition"
                 onClick={prevImage}
               >
                 <ChevronLeft size={40} />
               </button>
               <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white text-4xl p-2"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-white text-4xl p-2 hover:text-yellow-400 transition"
                 onClick={nextImage}
               >
                 <ChevronRight size={40} />
               </button>
 
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white font-semibold bg-black/50 px-4 py-1 rounded-full">
-                {currentImageIndex + 1}/{projetos[currentProject].imagens.length}
+                {currentImageIndex + 1}/{
+                  galeria.filter((item) => item.categoria === currentCategoria).length
+                }
               </div>
 
               <motion.div
@@ -221,8 +220,12 @@ export default function ProjetosPage() {
                 exit={{ opacity: 0 }}
               >
                 <Image
-                  src={projetos[currentProject].imagens[currentImageIndex]}
-                  alt={`${projetos[currentProject].titulo} ${currentImageIndex + 1}`}
+                  src={
+                    galeria.filter((item) => item.categoria === currentCategoria)[
+                      currentImageIndex
+                    ].url
+                  }
+                  alt={`${currentCategoria} ${currentImageIndex + 1}`}
                   width={800}
                   height={600}
                   className="rounded-xl object-contain w-full max-h-[80vh] mx-auto"
@@ -244,7 +247,7 @@ export default function ProjetosPage() {
         <h2 className="text-3xl font-bold text-gray-900 mb-6">
           Pronto para transformar seu espaço?
         </h2>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-700 mb-8">
           Entre em contato agora e peça seu orçamento sem compromisso.
         </p>
         <Link
@@ -257,5 +260,5 @@ export default function ProjetosPage() {
 
       <Footer />
     </main>
-  )
+  );
 }

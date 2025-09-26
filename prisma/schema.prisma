@@ -1,0 +1,135 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  // "sqlite", or "mysql", "postgresql", ...etc
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id
+  name      String   @db.Text
+  email     String
+  emailVerified Boolean @default(false)
+  image     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  sessions  Session[]
+  accounts  Account[]
+  logs      LogMensagem[] 
+  galeriaLogs LogGaleria[] 
+  @@unique([email])
+  @@map("user")
+}
+
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?  @db.Text
+  userAgent String?  @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @db.Text
+  providerId            String    @db.Text
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String   @db.Text
+  value      String   @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
+
+model Mensagem {
+  id        String   @id @default(uuid())
+  nome      String   @db.Text
+  email     String   @db.Text
+  telefone  String   @db.Text
+  endereco  String   @db.Text
+  titulo    String   @db.Text
+  descricao String   @db.Text
+  conteudo  String   @db.Text
+  status    String   @default("Não Lida") // "Não Lida", "Lida", "Resolvida", etc.
+  oculta    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  logs      LogMensagem[] // relação com log de alterações
+
+  @@map("mensagens")
+}
+
+model LogMensagem {
+  id          String   @id @default(uuid())
+  mensagemId  String
+  mensagem    Mensagem @relation(fields: [mensagemId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  acao        String   @db.Text // "alterou status", "excluiu", "editou título", etc.
+  valorAnterior String? @db.Text
+  valorNovo     String? @db.Text
+  createdAt   DateTime @default(now())
+
+  @@map("log_mensagem")
+}
+model Galeria {
+  id        String    @id @default(uuid())
+  url       String    @db.Text
+  categoria String    @db.Text
+  oculta    Boolean   @default(false) // "remoção lógica"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+
+  logs      LogGaleria[] // relação com logs de ações
+}
+
+model LogGaleria {
+  id           String   @id @default(uuid())
+  galeriaId    String
+  galeria      Galeria  @relation(fields: [galeriaId], references: [id], onDelete: Cascade)
+
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  acao         String   @db.Text
+  valorAnterior String? @db.Text
+  valorNovo     String? @db.Text
+  createdAt    DateTime @default(now())
+
+  @@map("log_galeria")
+}
+
+

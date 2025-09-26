@@ -4,16 +4,19 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Phone, MapPin, Home, Hammer, Paintbrush, Quote } from "lucide-react"
 import { EnvelopeIcon } from "@phosphor-icons/react"
-import { Menu } from "@/comonents/template/menu/page"
-import { Footer } from "@/comonents/template/footer/page"
+import { Menu } from "@/components/template/menu/page"
+import { Footer } from "@/components/template/footer/page"
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
+    telefone: "",
+    endereco: "",
     assunto: "",
     mensagem: "",
   })
+
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -22,11 +25,28 @@ export default function ContatoPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setStatus("idle")
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // simulação
+      const res = await fetch("/api/mensagens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: formData.nome,
+          email: formData.email,
+          telefone: formData.telefone,
+          endereco: formData.endereco,
+          titulo: formData.assunto,
+          descricao: formData.assunto,
+          conteudo: formData.mensagem,
+        }),
+      })
+
+      if (!res.ok) throw new Error("Falha ao enviar mensagem")
+
       setStatus("success")
-      setFormData({ nome: "", email: "", assunto: "", mensagem: "" })
-    } catch {
+      setFormData({ nome: "", email: "", telefone: "", endereco: "", assunto: "", mensagem: "" })
+    } catch (err) {
+      console.error(err)
       setStatus("error")
     }
   }
@@ -80,40 +100,58 @@ export default function ContatoPage() {
             viewport={{ once: true }}
           >
             <input
-            type="text"
-            name="nome"
-            placeholder="Nome"
-            value={formData.nome}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              type="text"
+              name="nome"
+              placeholder="Nome"
+              value={formData.nome}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             <input
-            type="text"
-            name="assunto"
-            placeholder="Assunto"
-            value={formData.assunto}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              type="text"
+              name="telefone"
+              placeholder="Telefone"
+              value={formData.telefone}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+            <input
+              type="text"
+              name="endereco"
+              placeholder="Endereço"
+              value={formData.endereco}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+            <input
+              type="text"
+              name="assunto"
+              placeholder="Assunto"
+              value={formData.assunto}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             <textarea
-            name="mensagem"
-            placeholder="Mensagem"
-            value={formData.mensagem}
-            onChange={handleChange}
-            required
-            rows={5}
-            className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              name="mensagem"
+              placeholder="Mensagem"
+              value={formData.mensagem}
+              onChange={handleChange}
+              required
+              rows={5}
+              className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
 
             <button
@@ -122,12 +160,9 @@ export default function ContatoPage() {
             >
               Enviar Mensagem
             </button>
-            {status === "success" && (
-              <p className="text-green-600 font-semibold">Mensagem enviada com sucesso!</p>
-            )}
-            {status === "error" && (
-              <p className="text-red-600 font-semibold">Erro ao enviar a mensagem. Tente novamente.</p>
-            )}
+
+            {status === "success" && <p className="text-green-600 font-semibold">Mensagem enviada com sucesso!</p>}
+            {status === "error" && <p className="text-red-600 font-semibold">Erro ao enviar a mensagem. Tente novamente.</p>}
           </motion.form>
 
           {/* Informações */}

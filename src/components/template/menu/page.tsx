@@ -11,10 +11,11 @@ type MenuLink = {
 }
 
 type MenuProps = {
-  menuLinks: MenuLink[]
+  menuLinks: MenuLink[],
+  children?: React.ReactNode
 }
 
-export function Menu({ menuLinks }: MenuProps) {
+export function Menu({ menuLinks, children }: MenuProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -23,11 +24,13 @@ export function Menu({ menuLinks }: MenuProps) {
         menuLinks={menuLinks}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        children={children}
       />
       <MenuMobile
         menuLinks={menuLinks}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        children={children}
       />
     </div>
   )

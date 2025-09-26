@@ -1,3 +1,4 @@
+import Image from "next/image";
 import LinksMenu from "./linksMenu"
 import { Building2, Menu, X } from "lucide-react";
 
@@ -8,21 +9,24 @@ type MenuLink = {
 }
 
 type MenuWebProps = {
-  menuLinks: MenuLink[]
-  mobileMenuOpen: boolean
-  setMobileMenuOpen: (open: boolean) => void
+  menuLinks: MenuLink[],
+  mobileMenuOpen: boolean,
+  setMobileMenuOpen: (open: boolean) => void,
+  children?: React.ReactNode
 }
-export default function MenuWeb({ menuLinks, mobileMenuOpen, setMobileMenuOpen } : MenuWebProps) {
+export default function MenuWeb({ menuLinks, mobileMenuOpen, setMobileMenuOpen, children } : MenuWebProps) {
   return (
     <nav className="px-6 py-4 flex items-center justify-between w-full mx-auto gap-6 fixed top-0 left-0 right-0 bg-white dark:bg-slate-900 shadow z-50" role="navigation">
+  
       {/* Logo fixa no canto esquerdo */}
-      <div className="flex-shrink-0 flex items-center gap-2 text-xl font-bold text-yellow-500">
-        <Building2 className="h-6 w-6" aria-hidden="true" />
-        <span>Severino Remodelações</span>
+      <div className="flex-shrink-0 flex items-center gap-2 text-xl font-bold text-yellow-500 dark:text-white">
+        {/* <Building2 className="h-6 w-6 text-yellow-500 dark:text-white" aria-hidden="true" />
+        <span>Severino Remodelações</span> */}
+        <Image src={"/image/logo.png"} alt="Logo" width={60} height={50} className="object-contain" />
       </div>
 
       {/* Links desktop */}
-      <div className="hidden md:flex gap-6 font-medium">
+      <div className="hidden md:flex gap-6 font-medium text-gray-800 dark:text-gray-100">
         {menuLinks.map((item, i) => (
           <LinksMenu
             key={i}
@@ -33,6 +37,7 @@ export default function MenuWeb({ menuLinks, mobileMenuOpen, setMobileMenuOpen }
             aparelho="web"
           />
         ))}
+        {children}
       </div>
 
       {/* Botão menu mobile */}
@@ -41,13 +46,14 @@ export default function MenuWeb({ menuLinks, mobileMenuOpen, setMobileMenuOpen }
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Abrir menu de navegação"
           aria-expanded={mobileMenuOpen}
-          className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-600 pl-4"
+          className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-600 pl-4 text-gray-800 dark:text-white"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           <span className="text-sm font-medium">Menu</span>
         </button>
       </div>
     </nav>
+
 
 
   )
