@@ -48,9 +48,15 @@ export async function POST(req: Request) {
     data: {
       url,
       categoria,
-      logs: {
-        create: { userId: session.user.id, acao: "adicionou imagem", valorNovo: `${categoria} | ${url}` },
-      },
+    },
+  });
+
+  await prisma.logGaleria.create({
+    data: {
+      galeriaId: galeria.id,
+      userId: session.user.id,
+      acao: "adicionou imagem",
+      valorNovo: `${categoria} | ${url}`,
     },
   });
 
