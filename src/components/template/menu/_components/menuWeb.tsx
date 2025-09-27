@@ -21,7 +21,7 @@ export default function MenuWeb({ menuLinks, mobileMenuOpen, setMobileMenuOpen, 
       {/* Logo fixa no canto esquerdo */}
       <div className="flex-shrink-0 flex items-center gap-2 text-xl font-bold text-yellow-500 dark:text-white">
         {/* <Building2 className="h-6 w-6 text-yellow-500 dark:text-white" aria-hidden="true" />
-        <span>Severino Remodelações</span> */}
+        <span>Severino Remodelações</span> */} 
         <Image src={"/image/logo.png"} alt="Logo" width={60} height={50} className="object-contain" />
       </div>
 
