@@ -121,7 +121,7 @@ model LogGaleria {
 }
 
 model galeria {
-  id        String       @id
+  id        String       @id @default(uuid())
   url       String       @db.Text
   categoria String       @db.Text
   oculta    Boolean      @default(false)
