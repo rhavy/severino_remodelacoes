@@ -82,28 +82,38 @@ export async function GET(request: Request) {
 
 // PUT: atualizar status ou conteúdo da mensagem
 export async function PUT(req: Request) {
-  try {
-    const { mensagemId, userId, status } = await req.json();
-
-    if (!mensagemId || !userId || !status) {
-      return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
+    try {
+      const { mensagemId, userId, status } = await req.json();
+  
+      if (!mensagemId || !userId || !status) {
+        return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
+      }
+  
+      const mensagem = await prisma.mensagem.findUnique({ where: { id: mensagemId } });
+      if (!mensagem) return NextResponse.json({ error: "Mensagem não encontrada" }, { status: 404 });
+  
+      // Atualiza status
+      const updated = await prisma.mensagem.update({
+        where: { id: mensagemId },
+        data: { 
+            status, 
+            logs: {
+                create: {
+                    userId,
+                    acao: `alterou status para ${status}`,
+                    valorAnterior: mensagem.status,
+                    valorNovo: status,
+                }
+            }
+        },
+      });
+  
+      return NextResponse.json(updated);
+    } catch (err) {
+      console.error("Erro ao atualizar mensagem:", err);
+      return NextResponse.json({ error: "Erro interno" }, { status: 500 });
     }
-
-    const mensagem = await prisma.mensagem.findUnique({ where: { id: mensagemId } });
-    if (!mensagem) return NextResponse.json({ error: "Mensagem não encontrada" }, { status: 404 });
-
-    // Atualiza status
-    const updated = await prisma.mensagem.update({
-      where: { id: mensagemId },
-      data: { status },
-    });
-
-    return NextResponse.json(updated);
-  } catch (err) {
-    console.error("Erro ao atualizar mensagem:", err);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
-}
 
 // PATCH: alternar oculto/exibir mensagem
 export async function PATCH(request: Request) {
@@ -150,4 +160,3 @@ export async function PATCH(request: Request) {
     );
   }
 }
-

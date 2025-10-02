@@ -17,15 +17,15 @@ export default function ContatoPage() {
     mensagem: "",
   })
 
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus("idle")
+    setStatus("loading")
     try {
       const res = await fetch("/api/mensagens", {
         method: "POST",
@@ -36,7 +36,7 @@ export default function ContatoPage() {
           telefone: formData.telefone,
           endereco: formData.endereco,
           titulo: formData.assunto,
-          descricao: formData.assunto,
+          descricao: formData.mensagem, // corrigido
           conteudo: formData.mensagem,
         }),
       })
@@ -99,7 +99,9 @@ export default function ContatoPage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
+            <label htmlFor="nome" className="sr-only">Nome</label>
             <input
+              id="nome"
               type="text"
               name="nome"
               placeholder="Nome"
@@ -108,16 +110,21 @@ export default function ContatoPage() {
               required
               className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+
+            <label htmlFor="email" className="sr-only">Email</label>
             <input
+              id="email"
               type="email"
               name="email"
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              required
               className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+
+            <label htmlFor="telefone" className="sr-only">Telefone</label>
             <input
+              id="telefone"
               type="text"
               name="telefone"
               placeholder="Telefone"
@@ -126,7 +133,10 @@ export default function ContatoPage() {
               required
               className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+
+            <label htmlFor="endereco" className="sr-only">Endereço</label>
             <input
+              id="endereco"
               type="text"
               name="endereco"
               placeholder="Endereço"
@@ -135,16 +145,31 @@ export default function ContatoPage() {
               required
               className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
-            <input
-              type="text"
+
+            <label htmlFor="assunto" className="sr-only">Assunto</label>
+            <select
+              id="assunto"
               name="assunto"
-              placeholder="Assunto"
               value={formData.assunto}
               onChange={handleChange}
               required
               className="border border-gray-300 rounded px-4 py-2 placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
+            >
+              <option value="" disabled>
+                Selecione o assunto
+              </option>
+              <option value="Residencial">Residencial</option>
+              <option value="Comercial">Comercial</option>
+              <option value="Industrial">Industrial</option>
+              <option value="Reformas">Reformas</option>
+              <option value="Construções">Construções</option>
+              <option value="Acabamentos">Acabamentos</option>
+              <option value="Manutenção Predial">Manutenção Predial</option>
+            </select>
+
+            <label htmlFor="mensagem" className="sr-only">Mensagem</label>
             <textarea
+              id="mensagem"
               name="mensagem"
               placeholder="Mensagem"
               value={formData.mensagem}
@@ -156,9 +181,12 @@ export default function ContatoPage() {
 
             <button
               type="submit"
-              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded transition"
+              disabled={status === "loading"}
+              className={`bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded transition ${
+                status === "loading" && "opacity-70 cursor-not-allowed"
+              }`}
             >
-              Enviar Mensagem
+              {status === "loading" ? "Enviando..." : "Enviar Mensagem"}
             </button>
 
             {status === "success" && <p className="text-green-600 font-semibold">Mensagem enviada com sucesso!</p>}
