@@ -56,7 +56,7 @@ export default function ProjetosPage() {
     setCurrentImageIndex((currentImageIndex - 1 + items.length) % items.length);
   };
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 100;
     if (info.offset.x > threshold) prevImage();
     else if (info.offset.x < -threshold) nextImage();

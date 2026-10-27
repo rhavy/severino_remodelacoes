@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     const { search, status, mes } = Object.fromEntries(new URL(request.url).searchParams.entries());
 
     // se status === "Ocultas", não filtramos oculta: false
-    let where: any = {};
+    const where: Record<string, unknown> = {};
     if (status !== "Ocultas") {
       where.oculta = false;
     }

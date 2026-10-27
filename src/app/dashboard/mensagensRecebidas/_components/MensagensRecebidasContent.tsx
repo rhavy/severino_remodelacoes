@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { X, Check, EyeOff, Eye } from "lucide-react";
@@ -107,7 +107,7 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
             prev.map((m) => (m.id === updated.id ? updated : m))
             );
             handleCloseModal();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Erro ao salvar status:", err);
             alert("Não foi possível atualizar o status. Tente novamente.");
         }
@@ -144,7 +144,7 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
         // setSelectedMensagem(updated); // mantém modal aberto com dados atualizados
         handleCloseModal();
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("Erro ao alternar oculto:", err);
         alert("Não foi possível alterar a visibilidade da mensagem. Tente novamente.");
     }

@@ -24,14 +24,16 @@ export function Menu({ menuLinks, children }: MenuProps) {
         menuLinks={menuLinks}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
-        children={children}
-      />
+      >
+        {children}
+      </MenuWeb>
       <MenuMobile
         menuLinks={menuLinks}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
-        children={children}
-      />
+      >
+        {children}
+      </MenuMobile>
     </div>
   )
 }
