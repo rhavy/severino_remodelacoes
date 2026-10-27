@@ -6,9 +6,9 @@ import { LayoutDashboard, Image, MessageSquare } from "lucide-react";
 
 const menuLinks = [
   { link: "/dashboard", titulo: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 text-yellow-500" /> },
+  { link: "/admin/leads", titulo: "Orçamentos (Leads)", icon: <MessageSquare className="w-5 h-5 text-yellow-500" /> },
   { link: "/dashboard/gallery", titulo: "Gallery", icon: <Image className="w-5 h-5 text-yellow-500" /> },
-  { link: "/dashboard/mensagensRecebidas", titulo: "Mensagens", icon: <MessageSquare className="w-5 h-5 text-yellow-500" /> }
-
+  { link: "/dashboard/mensagensRecebidas", titulo: "Mensagens Legadas", icon: <MessageSquare className="w-5 h-5 text-zinc-500" /> }
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

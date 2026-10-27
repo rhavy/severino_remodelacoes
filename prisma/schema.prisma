@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
+
 
 datasource db {
   provider = "mysql"
@@ -129,3 +129,22 @@ model galeria {
   updatedAt DateTime     @default(now())
   logs      LogGaleria[]
 }
+
+model Lead {
+  id                String   @id @default(uuid())
+  name              String
+  email             String
+  phone             String
+  contactPreference String   // "TELEFONE" ou "EMAIL"
+  isWhatsapp        Boolean  @default(false)
+  subject           String   // Ex: "Reforma Residencial", "Construção Nova", "Orçamento Geral", etc.
+  preferredDate     String?  // Data preferida para visita
+  preferredTime     String?  // Ex: "Manhã", "Tarde", "Sem preferência"
+  message           String   @db.Text
+  status            String   @default("PENDENTE") // "PENDENTE", "EM_ANALISE", "CONTATADO", "CONCLUIDO"
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+
+  @@map("leads")
+}
+

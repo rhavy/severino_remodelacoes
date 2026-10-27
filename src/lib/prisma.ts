@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 // lib/prisma.ts (reutilizável em todo o projeto)
 

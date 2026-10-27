@@ -7,7 +7,7 @@ export function Footer() {
 
         {/* Título */}
         <div className="border-b border-gray-600 pb-8 mb-8">
-          <h4 className="text-3xl font-bold text-center text-yellow-500">
+          <h4 className="text-3xl font-bold text-center text-amber-500">
             Severino Remodelações
           </h4>
         </div>
@@ -19,43 +19,41 @@ export function Footer() {
           <div>
             <h3 className="text-2xl font-semibold mb-4 text-white">Quem Somos</h3>
             <p className="mb-6 text-gray-400 leading-relaxed">
-              A <strong className="text-white">Severino Remodelações</strong> é especializada em reformas residenciais e comerciais, oferecendo
-              soluções de qualidade em construção civil. Do planejamento à execução, entregamos ambientes renovados,
-              seguros e funcionais para atender às suas necessidades.
+              A <strong className="text-white">Severino Remodelações</strong> é especializada em reformas e construções em geral, oferecendo
+              soluções de excelência técnica e máxima solidez estrutural para habitações e espaços comerciais em Portugal.
             </p>
             <a
-              href="https://wa.me/5511999999999?text=Olá, gostaria de solicitar um orçamento"
-              target="_blank"
-              className="inline-block bg-yellow-500 hover:bg-yellow-600 transition px-5 py-3 rounded-lg font-medium shadow-lg text-slate-900"
+              href="#orcamento"
+              className="inline-block bg-amber-500 hover:bg-amber-400 transition px-5 py-3 rounded-lg font-bold shadow-lg text-slate-950"
             >
               Solicitar Orçamento
             </a>
           </div>
 
-          {/* Contatos */}
+          {/* Contactos */}
           <div>
-            <h3 className="text-2xl font-semibold mb-4 text-white">Contatos</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-white">Contactos</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
                 Email:{" "}
                 <a
-                  href="mailto:contato@severinoremodelacoes.com"
-                  className="underline hover:text-yellow-500"
+                  href={`mailto:${process.env.NEXT_PUBLIC_COMPANY_EMAIL || "contato@severinoconstrucoes.pt"}`}
+                  className="underline hover:text-amber-400"
                 >
-                  contato@severinoremodelacoes.com
+                  {process.env.NEXT_PUBLIC_COMPANY_EMAIL || "contato@severinoconstrucoes.pt"}
                 </a>
               </li>
               <li>
                 Telefone:{" "}
                 <a
-                  href="tel:+5511999999999"
-                  className="underline hover:text-yellow-500"
+                  href={`tel:${(process.env.NEXT_PUBLIC_COMPANY_PHONE || "+351912345678").replace(/[^0-9+]/g, "")}`}
+                  className="underline hover:text-amber-400"
                 >
-                  +55 (11) 99999-9999
+                  {process.env.NEXT_PUBLIC_COMPANY_PHONE || "+351 912 345 678"}
                 </a>
               </li>
-              <li>Endereço: Rua Exemplo, 123, São Paulo - SP</li>
-              <li>CEP: 01234-567</li>
+              <li>Sede & Operações: Lisboa e Vale do Tejo, Portugal</li>
+              <li>Atendimento: Seg - Sex (08:00 - 19:00)</li>
             </ul>
           </div>
 
@@ -90,7 +88,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="mt-12 border-t border-gray-700 pt-6 text-center text-sm text-gray-500">
-          © 2025 Severino Remodelações. Todos os direitos reservados.
+          © {new Date().getFullYear()} Severino Remodelações. Todos os direitos reservados.
         </div>
       </div>
     </section>

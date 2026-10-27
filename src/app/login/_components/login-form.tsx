@@ -58,7 +58,7 @@ export function LoginForm() {
           },
           onError: (ctx) => {
             if (ctx.error.code === "INVALID_EMAIL_OR_PASSWORD") {
-              alert("Usuário ou senha inválido!")
+              alert("Utilizador ou palavra-passe inválidos!")
             }
           }
         }

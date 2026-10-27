@@ -1,9 +1,10 @@
 {
   "name": "severino_remodelacoes",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prisma:generate": "prisma generate",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint"
@@ -34,6 +35,7 @@
     "react-hook-form": "^7.63.0",
     "react-infinite-scroll-component": "^6.1.0",
     "recharts": "^2.15.4",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.3.1",
     "tailwind-variants": "^3.1.1",
     "tailwindcss-animate": "^1.0.7",
