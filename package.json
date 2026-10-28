@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "prisma:generate": "prisma generate",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "next start -p 3002",
     "lint": "eslint"
   },
   "dependencies": {
