@@ -57,7 +57,13 @@ async function getRegionalLocale(): Promise<Locale> {
   return "pt-PT";
 }
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+export function LanguageProvider({
+  children,
+  showPreferencePrompt = true,
+}: {
+  children: React.ReactNode;
+  showPreferencePrompt?: boolean;
+}) {
   const [locale, setLocaleState] = useState<Locale>("pt-PT");
   const [showPreferenceDialog, setShowPreferenceDialog] = useState(false);
   const [isChoosingRegion, setIsChoosingRegion] = useState(false);
@@ -100,8 +106,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setShowPreferenceDialog(true);
-  }, []);
+    if (showPreferencePrompt) {
+      setShowPreferenceDialog(true);
+    }
+  }, [showPreferencePrompt]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
