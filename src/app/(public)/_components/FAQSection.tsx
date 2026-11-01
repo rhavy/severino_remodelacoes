@@ -3,37 +3,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, HelpCircle } from "lucide-react";
-
-interface FAQItem {
-  question: string;
-  answer: string;
-}
-
-const faqs: FAQItem[] = [
-  {
-    question: "O pedido de orçamento e a visita técnica inicial têm custos?",
-    answer: "Não. A visita técnica para levantamento das necessidades do projeto e o envio da proposta detalhada com estimativa de prazos e valores são 100% gratuitos e sem qualquer compromisso para toda a região de Lisboa e arredores.",
-  },
-  {
-    question: "Como é garantido o cumprimento do prazo estipulado para a obra?",
-    answer: "Antes do início da obra, entregamos ao cliente um cronograma executivo detalhado semana a semana. Trabalhamos sob contrato com cláusulas contratuais de garantia de entrega no prazo acordado.",
-  },
-  {
-    question: "A Severino Remodelações trata das licenças e alvarás necessários?",
-    answer: "Sim. Acompanhamos e prestamos todo o apoio técnico para projetos camarários, pedidos de licença de ocupação de via pública e comunicação prévia junto das Câmaras Municipais.",
-  },
-  {
-    question: "Que garantias são fornecidas após a conclusão da obra?",
-    answer: "Cumprimos rigorosamente a legislação portuguesa em vigor, fornecendo garantias estruturais e garantia para intervenções de acabamentos e equipamentos instalados, com assistência pós-obra garantida.",
-  },
-  {
-    question: "Vocês realizam obras residenciais e comerciais?",
-    answer: "Sim. Realizamos desde remodelações de apartamentos e moradias até à construção e adaptação de espaços comerciais, escritórios, consultórios e armazéns industriais.",
-  },
-];
+import { useLanguage } from "@/components/LanguageProvider";
 
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { messages } = useLanguage();
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -54,18 +28,18 @@ export function FAQSection() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">
             <HelpCircle className="w-3.5 h-3.5" />
-            Tire Suas Dúvidas
+            {messages.faq.badge}
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            Perguntas Frequentes
+            {messages.faq.title}
           </h2>
           <p className="mt-3 text-zinc-400 text-sm sm:text-base">
-            Informações claras sobre o nosso processo de trabalho, contratação e garantias.
+            {messages.faq.description}
           </p>
         </motion.div>
 
         <div className="space-y-4">
-          {faqs.map((faq, idx) => {
+          {messages.faq.items.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
               <motion.div

@@ -1,6 +1,11 @@
+'use client';
+
 import { FacebookLogoIcon, InstagramLogoIcon, YoutubeLogoIcon } from '@phosphor-icons/react/dist/ssr';
+import { useLanguage } from "@/components/LanguageProvider";
 
 export function Footer() {
+  const { messages } = useLanguage();
+
   return (
     <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-16 text-gray-300">
       <div className="container mx-auto px-4">
@@ -17,25 +22,24 @@ export function Footer() {
 
           {/* Sobre a empresa */}
           <div>
-            <h3 className="text-2xl font-semibold mb-4 text-white">Quem Somos</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-white">{messages.footer.about}</h3>
             <p className="mb-6 text-gray-400 leading-relaxed">
-              A <strong className="text-white">Severino Remodelações</strong> é especializada em reformas e construções em geral, oferecendo
-              soluções de excelência técnica e máxima solidez estrutural para habitações e espaços comerciais em Portugal.
+              {messages.footer.aboutText}
             </p>
             <a
               href="#orcamento"
               className="inline-block bg-amber-500 hover:bg-amber-400 transition px-5 py-3 rounded-lg font-bold shadow-lg text-slate-950"
             >
-              Solicitar Orçamento
+              {messages.footer.request}
             </a>
           </div>
 
           {/* Contactos */}
           <div>
-            <h3 className="text-2xl font-semibold mb-4 text-white">Contactos</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-white">{messages.footer.contacts}</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
-                Email:{" "}
+                {messages.footer.emailLabel}{" "}
                 <a
                   href={`mailto:${process.env.NEXT_PUBLIC_COMPANY_EMAIL || "contato@severinoconstrucoes.pt"}`}
                   className="underline hover:text-amber-400"
@@ -44,7 +48,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                Telefone:{" "}
+                {messages.footer.phoneLabel}{" "}
                 <a
                   href={`tel:${(process.env.NEXT_PUBLIC_COMPANY_PHONE || "+351912345678").replace(/[^0-9+]/g, "")}`}
                   className="underline hover:text-amber-400"
@@ -52,14 +56,14 @@ export function Footer() {
                   {process.env.NEXT_PUBLIC_COMPANY_PHONE || "+351 912 345 678"}
                 </a>
               </li>
-              <li>Sede & Operações: Lisboa e Vale do Tejo, Portugal</li>
-              <li>Atendimento: Seg - Sex (08:00 - 19:00)</li>
+              <li>{messages.footer.headquarters}</li>
+              <li>{messages.footer.schedule}</li>
             </ul>
           </div>
 
           {/* Redes Sociais */}
           <div>
-            <h3 className="text-2xl font-semibold mb-4 text-white">Redes Sociais</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-white">{messages.footer.social}</h3>
             <div className="flex items-center gap-5 text-yellow-500">
               <a
                 href="https://facebook.com/severinoremodelacoes"
@@ -88,7 +92,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="mt-12 border-t border-gray-700 pt-6 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} Severino Remodelações. Todos os direitos reservados.
+          © {new Date().getFullYear()} Severino Remodelações. {messages.footer.rights}
         </div>
       </div>
     </section>

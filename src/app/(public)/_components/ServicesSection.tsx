@@ -2,32 +2,26 @@
 
 import { motion } from "framer-motion";
 import { Hammer, Building2, Paintbrush, Wrench, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export function ServicesSection() {
+  const { messages } = useLanguage();
   const services = [
     {
       icon: <Hammer className="w-7 h-7" />,
-      title: "Reformas Gerais & Interiores",
-      desc: "Remodelações completas de habitações e espaços comerciais. Demolições controladas, divisórias, tetos falsos em pladur e modernização espacial.",
-      items: ["Cozinhas e casas de banho modernas", "Canalização e redes elétricas novas", "Isolamento acústico"],
+      ...messages.services.items[0],
     },
     {
       icon: <Building2 className="w-7 h-7" />,
-      title: "Construção de Raiz",
-      desc: "Construção integral de moradias unifamiliares e edifícios desde as fundações, sapatas, lajes em betão armado até à entrega chave-na-mão.",
-      items: ["Projetos de estabilidade estrutural", "Alvenaria e isolamento térmico (Capoto)", "Gestão e licenciamento técnico"],
+      ...messages.services.items[1],
     },
     {
       icon: <Paintbrush className="w-7 h-7" />,
-      title: "Pinturas & Acabamentos Finos",
-      desc: "Acabamentos de alta gama com aplicação de tintas laváveis antifúngicas, microcimento decorativo, pavimentos flutuantes e cerâmica retificada.",
-      items: ["Pinturas de fachadas exteriores", "Envernizamento de madeiras nobres", "Assentamento de pedras naturais"],
+      ...messages.services.items[2],
     },
     {
       icon: <Wrench className="w-7 h-7" />,
-      title: "Impermeabilização & Coberturas",
-      desc: "Diagnóstico e reparação de infiltrações, substituição de telhados e aplicação de mantas asfálticas de alta espessura em terraços.",
-      items: ["Eliminação permanente de humidades", "Substituição e reforço de caleiras", "Garantia de estanquidade"],
+      ...messages.services.items[3],
     },
   ];
 
@@ -64,13 +58,13 @@ export function ServicesSection() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <span className="text-xs uppercase font-extrabold tracking-widest text-amber-500 bg-amber-500/10 px-3.5 py-1.5 rounded-full border border-amber-500/20">
-            Competências Técnicas
+            {messages.services.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-white mt-4 tracking-tight">
-            Nossos Serviços de Construção & Remodelação
+            {messages.services.title}
           </h2>
           <p className="mt-3 text-zinc-400 text-sm sm:text-base">
-            Qualquer que seja a dimensão do seu projeto, temos o know-how de engenharia para executar com perfeição e cumprimento de prazos.
+            {messages.services.description}
           </p>
         </motion.div>
 
@@ -103,10 +97,10 @@ export function ServicesSection() {
                   {serv.title}
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-                  {serv.desc}
+                  {serv.description}
                 </p>
                 <div className="space-y-2.5 pt-4 border-t border-zinc-800/80">
-                  {serv.items.map((it, i) => (
+                  {serv.details.map((it, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs text-zinc-300">
                       <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" />
                       <span>{it}</span>
@@ -116,12 +110,12 @@ export function ServicesSection() {
               </div>
 
               <div className="mt-8 pt-4 flex justify-between items-center text-xs">
-                <span className="text-zinc-500">Mão de obra especializada</span>
+                <span className="text-zinc-500">{messages.services.labor}</span>
                 <a
                   href="#orcamento"
                   className="text-amber-400 hover:text-amber-300 font-bold uppercase tracking-wider inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform"
                 >
-                  Consultar Valor &rarr;
+                  {messages.services.consult} &rarr;
                 </a>
               </div>
             </motion.div>

@@ -1,10 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import {
-  Building2,
-  Hammer,
   ShieldCheck,
   CheckCircle,
   PhoneCall,
@@ -13,8 +10,10 @@ import {
   Award,
   Sparkles,
 } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export function Hero() {
+  const { messages } = useLanguage();
   const companyPhone = process.env.NEXT_PUBLIC_COMPANY_PHONE || "+351 912 345 678";
   const cleanPhone = companyPhone.replace(/[^0-9+]/g, "");
 
@@ -37,7 +36,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/90 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-semibold tracking-wide uppercase shadow-lg shadow-amber-500/5 mb-6"
           >
             <HardHat className="w-4 h-4 text-amber-500" />
-            <span>Severino Remodelações &bull; Especialistas em Construção Civil & Reformas</span>
+            <span>{messages.hero.badge}</span>
           </motion.div>
 
           {/* Frase do Título de Impacto (Hero) */}
@@ -47,11 +46,11 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]"
           >
-            Especialistas em{" "}
+            {messages.hero.titleStart}{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-600">
-              Reformas e Construções em Geral
+              {messages.hero.titleHighlight}
             </span>{" "}
-            com Rigor Técnico e Alta Durabilidade.
+            {messages.hero.titleEnd}
           </motion.h1>
 
           {/* Subtítulo institucional */}
@@ -61,7 +60,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-6 text-base sm:text-xl text-zinc-300 max-w-3xl mx-auto leading-relaxed"
           >
-            Da fundação aos acabamentos finos de alta gama: transformamos espaços residenciais e comerciais em Portugal com cumprimento estrito de prazos, transparência de custos e materiais de primeira linha.
+            {messages.hero.description}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -75,7 +74,7 @@ export function Hero() {
               href="#orcamento"
               className="w-full sm:w-auto px-8 py-4 rounded-xl font-black text-zinc-950 bg-amber-500 hover:bg-amber-400 active:scale-95 transition-all shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 uppercase tracking-wider text-sm cursor-pointer"
             >
-              Pedir Orçamento Gratuito
+              {messages.hero.quote}
               <ArrowRight className="w-4 h-4" />
             </a>
 
@@ -84,7 +83,7 @@ export function Hero() {
               className="w-full sm:w-auto px-7 py-4 rounded-xl font-bold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-amber-500/40 transition-all flex items-center justify-center gap-2 text-sm"
             >
               <PhoneCall className="w-4 h-4 text-amber-500" />
-              Ligar Agora: {companyPhone}
+              {messages.hero.call}: {companyPhone}
             </a>
           </motion.div>
 
@@ -100,8 +99,8 @@ export function Hero() {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">Garantia Técnica</h4>
-                <p className="text-xs text-zinc-400">Obras certificadas e seguras</p>
+                <h4 className="text-sm font-bold text-white">{messages.hero.guarantee}</h4>
+                <p className="text-xs text-zinc-400">{messages.hero.guaranteeText}</p>
               </div>
             </div>
 
@@ -110,8 +109,8 @@ export function Hero() {
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">Prazo Rigoroso</h4>
-                <p className="text-xs text-zinc-400">Planeamento sem atrasos</p>
+                <h4 className="text-sm font-bold text-white">{messages.hero.deadline}</h4>
+                <p className="text-xs text-zinc-400">{messages.hero.deadlineText}</p>
               </div>
             </div>
 
@@ -120,8 +119,8 @@ export function Hero() {
                 <Award className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">Materiais Nobres</h4>
-                <p className="text-xs text-zinc-400">Qualidade de longa duração</p>
+                <h4 className="text-sm font-bold text-white">{messages.hero.materials}</h4>
+                <p className="text-xs text-zinc-400">{messages.hero.materialsText}</p>
               </div>
             </div>
 
@@ -130,8 +129,8 @@ export function Hero() {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">Chave na Mão</h4>
-                <p className="text-xs text-zinc-400">Gestão do início ao fim</p>
+                <h4 className="text-sm font-bold text-white">{messages.hero.turnkey}</h4>
+                <p className="text-xs text-zinc-400">{messages.hero.turnkeyText}</p>
               </div>
             </div>
           </motion.div>

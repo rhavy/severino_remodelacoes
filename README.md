@@ -31,6 +31,8 @@ Galeria de projetos com imagens e descrições
 
 Formulário de contato funcional
 
+Seletor de idioma com Português (Portugal), inglês, espanhol e francês. Na primeira visita, o visitante pode escolher o idioma associado à sua região ou manter Português (Portugal); a preferência é guardada num cookie durante um ano e pode ser alterada no menu superior ou no menu móvel. A deteção regional utiliza os cabeçalhos `x-vercel-ip-country`, `cf-ipcountry` ou `x-country-code`; quando nenhum está disponível, usa o idioma preferido do navegador e, por fim, Português (Portugal).
+
 Seção de depoimentos de clientes
 
 Responsivo para todos os dispositivos

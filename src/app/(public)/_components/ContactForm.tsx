@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,7 +12,6 @@ import {
   Mail,
   Phone,
   User,
-  MessageSquare,
   CheckCircle2,
   Loader2,
   Send,
@@ -20,25 +19,33 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { submitLeadAction } from "@/app/actions/leads";
+import { useLanguage } from "@/components/LanguageProvider";
+import type { TranslationMessages } from "@/lib/translations";
 
-const formSchema = z.object({
-  name: z.string().min(2, "Por favor, insira o seu nome completo."),
-  email: z.string().email("Por favor, insira um endereço de e-mail válido."),
-  phone: z.string().min(9, "Por favor, insira um número de telefone com pelo menos 9 dígitos."),
-  contactPreference: z.enum(["TELEFONE", "EMAIL"], {
-    error: "Selecione como prefere ser contactado.",
-  }),
-  isWhatsapp: z.boolean().default(false),
-  subject: z.string().min(1, "Selecione o tipo de intervenção ou assunto."),
-  preferredDate: z.string().optional(),
-  preferredTime: z.string().optional(),
-  message: z.string().min(10, "Descreva detalhadamente o projeto ou intervenção desejada (mínimo 10 caracteres)."),
-});
+function createFormSchema(errors: TranslationMessages["form"]["errors"]) {
+  return z.object({
+    name: z.string().min(2, errors.name),
+    email: z.string().email(errors.email),
+    phone: z.string().min(9, errors.phone),
+    contactPreference: z.enum(["TELEFONE", "EMAIL"], {
+      error: errors.preference,
+    }),
+    isWhatsapp: z.boolean().default(false),
+    subject: z.string().min(1, errors.subject),
+    preferredDate: z.string().optional(),
+    preferredTime: z.string().optional(),
+    message: z.string().min(10, errors.message),
+  });
+}
 
-type FormInput = z.input<typeof formSchema>;
-type FormValues = z.output<typeof formSchema>;
+type FormSchema = ReturnType<typeof createFormSchema>;
+type FormInput = z.input<FormSchema>;
+type FormValues = z.output<FormSchema>;
 
 export default function ContactForm() {
+  const { messages } = useLanguage();
+  const formMessages = messages.form;
+  const formSchema = useMemo(() => createFormSchema(formMessages.errors), [formMessages.errors]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
@@ -46,10 +53,8 @@ export default function ContactForm() {
     register,
     handleSubmit,
     reset,
-    watch,
-    setValue,
     formState: { errors },
-  } = useForm<FormInput, any, FormValues>({
+  } = useForm<FormInput, undefined, FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -64,29 +69,26 @@ export default function ContactForm() {
     },
   });
 
-  const isWhatsapp = watch("isWhatsapp");
-  const contactPreference = watch("contactPreference");
-
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
       const response = await submitLeadAction(data);
 
       if (response.success) {
-        toast.success("Pedido de Orçamento Enviado!", {
-          description: "Recebemos os seus dados. Um dos nossos especialistas entrará em contacto muito em breve.",
+        toast.success(formMessages.errors.sentTitle, {
+          description: formMessages.errors.sentDescription,
           duration: 5000,
         });
         setSubmittedSuccess(true);
         reset();
       } else {
-        toast.error("Atenção ao submeter", {
-          description: response.error || "Ocorreu uma falha. Por favor, tente novamente.",
+        toast.error(formMessages.errors.submitTitle, {
+          description: response.error || formMessages.errors.submitDescription,
         });
       }
-    } catch (err: any) {
-      toast.error("Erro inesperado", {
-        description: "Não foi possível enviar a mensagem. Tente novamente mais tarde.",
+    } catch {
+      toast.error(formMessages.errors.unexpected, {
+        description: formMessages.errors.sendError,
       });
     } finally {
       setIsSubmitting(false);
@@ -108,13 +110,13 @@ export default function ContactForm() {
       <div className="relative z-10 mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wide uppercase mb-3">
           <Building2 className="w-3.5 h-3.5" />
-          Orçamento Gratuito & Sem Compromisso
+          {formMessages.badge}
         </div>
         <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-          Peça a sua Proposta à <span className="text-amber-500">Severino Remodelações</span>
+          {formMessages.title} <span className="text-amber-500">Severino Remodelações</span>
         </h3>
         <p className="mt-2 text-sm sm:text-base text-zinc-400">
-          Preencha o formulário abaixo. Analisamos cada detalhe com rigor técnico e rapidez para concretizar a sua obra.
+          {formMessages.description}
         </p>
       </div>
 
@@ -128,8 +130,8 @@ export default function ContactForm() {
           >
             <CheckCircle2 className="w-6 h-6 text-amber-400 shrink-0" />
             <div className="text-sm">
-              <p className="font-semibold text-white">O seu pedido foi registado com sucesso!</p>
-              <p className="text-zinc-300">A nossa equipa já se encontra a analisar o seu pedido.</p>
+              <p className="font-semibold text-white">{formMessages.successTitle}</p>
+              <p className="text-zinc-300">{formMessages.successDescription}</p>
             </div>
           </motion.div>
         )}
@@ -139,7 +141,7 @@ export default function ContactForm() {
         {/* Nome Completo */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-            Nome Completo *
+            {formMessages.name} *
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
@@ -147,7 +149,7 @@ export default function ContactForm() {
             </div>
             <input
               type="text"
-              placeholder="Ex: Manuel Silva"
+              placeholder={formMessages.namePlaceholder}
               {...register("name")}
               className={`w-full pl-10 pr-4 py-3 bg-zinc-950 border rounded-xl text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
                 errors.name ? "border-red-500 focus:ring-red-500" : "border-zinc-800"
@@ -162,7 +164,7 @@ export default function ContactForm() {
           {/* E-mail */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-              E-mail *
+              {formMessages.email} *
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
@@ -170,7 +172,7 @@ export default function ContactForm() {
               </div>
               <input
                 type="email"
-                placeholder="exemplo@dominio.pt"
+                placeholder={formMessages.emailPlaceholder}
                 {...register("email")}
                 className={`w-full pl-10 pr-4 py-3 bg-zinc-950 border rounded-xl text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
                   errors.email ? "border-red-500 focus:ring-red-500" : "border-zinc-800"
@@ -183,7 +185,7 @@ export default function ContactForm() {
           {/* Telefone */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-              Telefone / Telemóvel *
+              {formMessages.phone} *
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
@@ -206,7 +208,7 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-              Preferência de Contacto
+              {formMessages.contactPreference}
             </label>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 cursor-pointer text-sm text-zinc-300 hover:text-white">
@@ -216,7 +218,7 @@ export default function ContactForm() {
                   {...register("contactPreference")}
                   className="w-4 h-4 text-amber-500 accent-amber-500 focus:ring-amber-500"
                 />
-                Telefone
+                {formMessages.telephone}
               </label>
               <label className="flex items-center gap-2 cursor-pointer text-sm text-zinc-300 hover:text-white">
                 <input
@@ -225,7 +227,7 @@ export default function ContactForm() {
                   {...register("contactPreference")}
                   className="w-4 h-4 text-amber-500 accent-amber-500 focus:ring-amber-500"
                 />
-                E-mail
+                {formMessages.emailMethod}
               </label>
             </div>
           </div>
@@ -239,7 +241,7 @@ export default function ContactForm() {
               />
               <span className="flex items-center gap-1.5 text-zinc-200">
                 <MessageCircle className="w-4 h-4 text-emerald-400" />
-                Este número é WhatsApp?
+                {formMessages.whatsapp}
               </span>
             </label>
           </div>
@@ -248,18 +250,18 @@ export default function ContactForm() {
         {/* Assunto / Tipo de Obra */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-            Tipo de Obra ou Assunto *
+            {formMessages.subject} *
           </label>
           <select
             {...register("subject")}
             className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all cursor-pointer"
           >
-            <option value="Reformas Gerais">Reformas Gerais</option>
-            <option value="Construção de Raiz">Construção de Raiz (Construção Nova)</option>
-            <option value="Remodelação de Interiores">Remodelação de Interiores (Cozinhas, Casas de Banho)</option>
-            <option value="Reabilitação de Fachadas">Reabilitação de Fachadas e Telhados</option>
-            <option value="Pintura e Acabamentos">Pintura e Acabamentos Finos</option>
-            <option value="Orçamento Geral / Outro">Outros / Orçamento Geral</option>
+            <option value="Reformas Gerais">{formMessages.subjects[0]}</option>
+            <option value="Construção de Raiz">{formMessages.subjects[1]}</option>
+            <option value="Remodelação de Interiores">{formMessages.subjects[2]}</option>
+            <option value="Reabilitação de Fachadas">{formMessages.subjects[3]}</option>
+            <option value="Pintura e Acabamentos">{formMessages.subjects[4]}</option>
+            <option value="Orçamento Geral / Outro">{formMessages.subjects[5]}</option>
           </select>
           {errors.subject && <p className="mt-1.5 text-xs text-red-400 font-medium">{errors.subject.message}</p>}
         </div>
@@ -268,7 +270,7 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-              Data Sugerida para Visita Técnica
+              {formMessages.date}
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
@@ -284,7 +286,7 @@ export default function ContactForm() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-              Horário Preferencial de Visita
+              {formMessages.time}
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
@@ -294,10 +296,10 @@ export default function ContactForm() {
                 {...register("preferredTime")}
                 className="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all cursor-pointer"
               >
-                <option value="Manhã (09h - 13h)">Manhã (09h - 13h)</option>
-                <option value="Tarde (14h - 18h)">Tarde (14h - 18h)</option>
-                <option value="Final do Dia (18h - 20h)">Final do Dia (18h - 20h)</option>
-                <option value="Sem preferência">Sem preferência / Qualquer horário</option>
+                <option value="Manhã (09h - 13h)">{formMessages.times[0]}</option>
+                <option value="Tarde (14h - 18h)">{formMessages.times[1]}</option>
+                <option value="Final do Dia (18h - 20h)">{formMessages.times[2]}</option>
+                <option value="Sem preferência">{formMessages.times[3]}</option>
               </select>
             </div>
           </div>
@@ -306,12 +308,12 @@ export default function ContactForm() {
         {/* Textarea para Descrição Detalhada */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
-            Descrição Detalhada do Projeto ou Obra *
+            {formMessages.message} *
           </label>
           <div className="relative">
             <textarea
               rows={4}
-              placeholder="Indique a localização aproximada, dimensões da área, tipo de intervenção necessária e expectativas de prazo..."
+              placeholder={formMessages.messagePlaceholder}
               {...register("message")}
               className={`w-full p-4 bg-zinc-950 border rounded-xl text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all resize-y ${
                 errors.message ? "border-red-500 focus:ring-red-500" : "border-zinc-800"
@@ -332,18 +334,18 @@ export default function ContactForm() {
           {isSubmitting ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              A enviar o seu pedido...
+              {formMessages.submitting}
             </>
           ) : (
             <>
               <Send className="w-5 h-5" />
-              Solicitar Orçamento Gratuito
+              {formMessages.submit}
             </>
           )}
         </motion.button>
 
         <p className="text-center text-xs text-zinc-500">
-          Ao submeter este formulário, concorda com o tratamento dos dados exclusivamente para contacto e apresentação da proposta comercial da Severino Remodelações.
+          {formMessages.privacy}
         </p>
       </form>
     </motion.div>

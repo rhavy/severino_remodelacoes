@@ -2,9 +2,12 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { CheckCircle2, Shield, Users, Trophy } from "lucide-react";
+import { CheckCircle2, Shield, Trophy } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export function AboutSection() {
+  const { messages } = useLanguage();
+
   return (
     <section id="sobre" className="py-24 px-6 bg-zinc-950 border-b border-zinc-800 relative overflow-hidden">
       {/* Luz ambiente sutil decorativa */}
@@ -21,16 +24,16 @@ export function AboutSection() {
           >
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-widest mb-4">
               <Trophy className="w-3.5 h-3.5" />
-              Severino Remodelações &bull; Tradição e Confiança
+              {messages.about.badge}
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-snug">
-              Transformamos Projetos em Realidade com Máxima Exigência Construtiva
+              {messages.about.title}
             </h2>
             <p className="mt-5 text-zinc-300 leading-relaxed text-sm sm:text-base">
-              Fundada com a premissa de superar a informalidade no setor da construção civil, a <strong className="text-amber-400">Severino Remodelações</strong> consolidou-se como referência no mercado português de obras residenciais e remodelações corporativas.
+              {messages.about.paragraph1}
             </p>
             <p className="mt-3 text-zinc-400 leading-relaxed text-sm">
-              Combinamos planeamento de engenharia rigoroso, materiais com certificação europeia e uma equipa própria de operários especializados em alvenaria, carpintaria, eletricidade, canalização e acabamentos de requinte.
+              {messages.about.paragraph2}
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4">
@@ -39,8 +42,8 @@ export function AboutSection() {
                 transition={{ type: "spring", stiffness: 300 }}
                 className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 transition-colors shadow-lg"
               >
-                <span className="text-2xl font-black text-amber-400 block">+10 Anos</span>
-                <span className="text-xs text-zinc-400 mt-1 block">De experiência no mercado de construção</span>
+                <span className="text-2xl font-black text-amber-400 block">{messages.about.years}</span>
+                <span className="text-xs text-zinc-400 mt-1 block">{messages.about.experience}</span>
               </motion.div>
               <motion.div
                 whileHover={{ scale: 1.03, borderColor: "rgba(245, 158, 11, 0.4)" }}
@@ -48,16 +51,12 @@ export function AboutSection() {
                 className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 transition-colors shadow-lg"
               >
                 <span className="text-2xl font-black text-amber-400 block">100%</span>
-                <span className="text-xs text-zinc-400 mt-1 block">Compromisso com prazos estipulados</span>
+                <span className="text-xs text-zinc-400 mt-1 block">{messages.about.commitment}</span>
               </motion.div>
             </div>
 
             <div className="mt-8 space-y-3">
-              {[
-                "Alvará de construção e seguros de responsabilidade civil ativos",
-                "Acompanhamento direto e diário de encarregado geral em todas as obras",
-                "Orçamentos discriminados sem surpresas ou cobranças imprevistas",
-              ].map((text, i) => (
+              {messages.about.points.map((text, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, x: -20 }}
@@ -88,7 +87,7 @@ export function AboutSection() {
             >
               <Image
                 src="/image/quem-somos.jpeg"
-                alt="Equipa de engenharia e obras da Severino Remodelações"
+                alt={messages.about.imageAlt}
                 fill
                 className="object-cover transition-transform duration-700 hover:scale-105"
                 priority
@@ -110,8 +109,8 @@ export function AboutSection() {
                   <Shield className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Garantia Estrutural</h4>
-                  <p className="text-[11px] text-zinc-400">Total assistência pós-conclusão da obra</p>
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">{messages.about.structural}</h4>
+                  <p className="text-[11px] text-zinc-400">{messages.about.assistance}</p>
                 </div>
               </div>
             </motion.div>

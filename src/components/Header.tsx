@@ -1,126 +1,90 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, PhoneCall, Menu as MenuIcon, X } from "lucide-react";
+import { Building2, Menu as MenuIcon, X } from "lucide-react";
 import { useState } from "react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const companyPhone = process.env.NEXT_PUBLIC_COMPANY_PHONE || "+351 912 345 678";
-  const cleanPhone = companyPhone.replace(/[^0-9+]/g, "");
+  const { messages } = useLanguage();
+  const links = [
+    { href: "#sobre", label: messages.header.about },
+    { href: "#servicos", label: messages.header.services },
+    { href: "#galeria", label: messages.header.gallery },
+    { href: "#faq", label: messages.header.faq },
+    { href: "#contato", label: messages.header.contact },
+  ];
 
   return (
-    <header className="w-full fixed top-0 left-0 right-0 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800 text-white shadow-xl z-50">
+    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/90 text-white shadow-xl backdrop-blur-md">
       <div className="container mx-auto px-6">
-        <nav className="flex items-center justify-between gap-6 h-20" role="navigation">
-          {/* Logo & Marca */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-zinc-950 font-black shadow-lg shadow-amber-500/20 group-hover:bg-amber-400 transition-colors">
-              <Building2 className="w-6 h-6" />
+        <nav className="flex h-20 items-center justify-between gap-6" aria-label={messages.header.navigation}>
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 font-black text-zinc-950 shadow-lg shadow-amber-500/20 transition-colors group-hover:bg-amber-400">
+              <Building2 className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-xl font-black tracking-tight text-white block leading-none">
+              <span className="block text-xl font-black leading-none tracking-tight text-white">
                 SEVERINO
               </span>
-              <span className="text-xs font-bold tracking-widest text-amber-400 uppercase">
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
                 REMODELAÇÕES
               </span>
             </div>
           </Link>
 
-          {/* Links Desktop */}
-          <div className="hidden lg:flex items-center gap-8 text-sm font-semibold text-zinc-300">
-            <a href="#sobre" className="hover:text-amber-400 transition-colors">
-              Sobre Nós
-            </a>
-            <a href="#servicos" className="hover:text-amber-400 transition-colors">
-              Serviços
-            </a>
-            <a href="#galeria" className="hover:text-amber-400 transition-colors">
-              Galeria
-            </a>
-            <a href="#faq" className="hover:text-amber-400 transition-colors">
-              Perguntas Frequentes
-            </a>
-            <a href="#contato" className="hover:text-amber-400 transition-colors">
-              Contacto
-            </a>
+          <div className="hidden items-center gap-8 text-sm font-semibold text-zinc-300 lg:flex">
+            {links.map(({ href, label }) => (
+              <a key={href} href={href} className="transition-colors hover:text-amber-400">
+                {label}
+              </a>
+            ))}
           </div>
 
-          {/* Contacto / CTA */}
-          <div className="hidden sm:flex items-center gap-4">
-            <a
-              href={`tel:${cleanPhone}`}
-              className="text-xs text-zinc-300 hover:text-white flex items-center gap-1.5"
-            >
-              <PhoneCall className="w-3.5 h-3.5 text-amber-500" />
-              <span>{companyPhone}</span>
-            </a>
+          <div className="hidden items-center gap-4 sm:flex">
+            <LanguageSwitcher />
             <a
               href="#orcamento"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-950 bg-amber-500 hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-zinc-950 shadow-md shadow-amber-500/20 transition-all hover:bg-amber-400"
             >
-              Pedir Orçamento
+              {messages.header.quote}
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-zinc-400 hover:text-white focus:outline-none"
-            aria-label="Toggle menu"
+            className="p-2 text-zinc-400 hover:text-white focus:outline-none lg:hidden"
+            aria-label={isMobileMenuOpen ? messages.header.closeMenu : messages.header.menu}
+            aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
           </button>
         </nav>
       </div>
 
-      {/* Dropdown Mobile */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-zinc-950 border-b border-zinc-800 px-6 py-6 space-y-4">
-          <a
-            href="#sobre"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block text-zinc-200 hover:text-amber-400 font-medium"
-          >
-            Sobre Nós
-          </a>
-          <a
-            href="#servicos"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block text-zinc-200 hover:text-amber-400 font-medium"
-          >
-            Serviços
-          </a>
-          <a
-            href="#galeria"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block text-zinc-200 hover:text-amber-400 font-medium"
-          >
-            Galeria de Obras
-          </a>
-          <a
-            href="#faq"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block text-zinc-200 hover:text-amber-400 font-medium"
-          >
-            Perguntas Frequentes
-          </a>
-          <a
-            href="#contato"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block text-zinc-200 hover:text-amber-400 font-medium"
-          >
-            Contacto & Orçamento
-          </a>
-          <div className="pt-4 border-t border-zinc-800 flex flex-col gap-3">
+        <div className="space-y-4 border-b border-zinc-800 bg-zinc-950 px-6 py-6 lg:hidden">
+          {links.map(({ href, label }) => (
+            <a
+              key={href}
+              href={href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block font-medium text-zinc-200 hover:text-amber-400"
+            >
+              {label}
+            </a>
+          ))}
+          <div className="flex flex-col gap-3 border-t border-zinc-800 pt-4">
+            <LanguageSwitcher fullWidth />
             <a
               href="#orcamento"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-center py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-950 bg-amber-500 hover:bg-amber-400 transition-all"
+              className="rounded-xl bg-amber-500 py-3 text-center text-xs font-bold uppercase tracking-wider text-zinc-950 transition-all hover:bg-amber-400"
             >
-              Pedir Orçamento Gratuito
+              {messages.header.quoteFree}
             </a>
           </div>
         </div>
@@ -128,4 +92,5 @@ export function Header() {
     </header>
   );
 }
+
 export default Header;
