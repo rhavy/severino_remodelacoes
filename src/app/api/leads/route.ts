@@ -42,11 +42,11 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API /api/leads error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: error.errors[0]?.message },
+        { success: false, error: error.issues[0]?.message },
         { status: 400 }
       );
     }
@@ -63,7 +63,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ success: true, data: leads });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Erro ao buscar orçamentos." },
       { status: 500 }

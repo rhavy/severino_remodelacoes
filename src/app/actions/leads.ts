@@ -39,12 +39,12 @@ export async function submitLeadAction(data: LeadInput) {
       data: lead,
       message: "Pedido de orçamento enviado com sucesso! Nossa equipa entrará em contacto brevemente.",
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erro ao submeter lead:", error);
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: error.errors[0]?.message || "Dados inválidos fornecidos no formulário.",
+        error: error.issues[0]?.message || "Dados inválidos fornecidos no formulário.",
       };
     }
     return {
