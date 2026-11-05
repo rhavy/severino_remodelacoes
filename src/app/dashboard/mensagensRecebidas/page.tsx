@@ -8,8 +8,8 @@ export default async function MensagensRecebidas() {
   const session = await auth.api.getSession({
         headers: await headers()
       })
-      if (!session || !session?.user.emailVerified === true) {
-        redirect("/");
+      if (!session?.user) {
+        redirect("/login");
       }
 
   return <MensagensRecebidasContent userId={session.user.id} username={session.user.name} />;

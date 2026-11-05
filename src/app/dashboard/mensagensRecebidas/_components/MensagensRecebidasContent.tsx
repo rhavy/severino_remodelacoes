@@ -167,11 +167,11 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
 
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-5 p-3 sm:space-y-6 sm:p-5 2xl:p-8">
       {/* Título e descrição */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-yellow-600">📩 Mensagens Recebidas</h1>
-        <p className="text-gray-600">
+        <h1 className="text-2xl font-bold text-yellow-600 sm:text-3xl">📩 Mensagens Recebidas</h1>
+        <p className="text-sm text-gray-600 sm:text-base">
           Visualize, filtre e busque mensagens por nome, e-mail, telefone ou endereço.
         </p>
       </div>
@@ -181,14 +181,14 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
         <input
           type="text"
           placeholder="Buscar por nome, e-mail, telefone ou endereço"
-          className="border border-gray-300 rounded-lg px-3 py-2 flex-1 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+          className="w-full min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusMensagem | "Todos" | "Ocultas")}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none sm:w-auto"
             >
             {statusOptions.map((status) => (
                 <option key={status} value={status}>
@@ -201,12 +201,12 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
           type="month"
           value={monthFilter}
           onChange={(e) => setMonthFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none sm:w-auto"
         />
       </div>
 
       {/* Grid mensagens */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4 sm:gap-6">
         {loading ? (
           <p className="text-gray-500">Carregando...</p>
         ) : mensagensFiltradas.length === 0 ? (
@@ -215,12 +215,12 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
           mensagensFiltradas.map((msg) => (
             <motion.div
               key={msg.id}
-              className="bg-white rounded-lg shadow p-4 flex flex-col gap-1 cursor-pointer hover:shadow-lg transition"
+              className="flex min-w-0 cursor-pointer flex-col gap-1 rounded-lg bg-white p-3 shadow transition hover:shadow-lg sm:p-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={() => handleOpenModal(msg)}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                 <Image
                   src={msg.avatar || "/image/AvatarCliente.png"}
                   alt={msg.nome}
@@ -229,7 +229,7 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
                   className="rounded-full object-cover"
                   unoptimized
                 />
-                <div className="flex-1 text-sm">
+                <div className="min-w-0 flex-1 text-sm">
                   <p className="font-semibold text-gray-800">{msg.nome}</p>
                   <p className="font-medium text-gray-700">{msg.titulo}</p>
                   <p className="text-gray-500 truncate">{msg.descricao}</p>
@@ -261,8 +261,8 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
 
       {/* Modal */}
       {selectedMensagem && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-lg space-y-4 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-6">
+          <div className="relative my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-lg space-y-4 overflow-y-auto rounded-lg bg-white p-4 shadow-lg sm:max-h-[calc(100dvh-3rem)] sm:p-6">
             <button
               onClick={handleCloseModal}
               className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
@@ -271,7 +271,7 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
             </button>
 
             <div className="space-y-2">
-              <div className="flex items-center gap-4">
+              <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
                 <Image
                   src={selectedMensagem.avatar || "/image/AvatarCliente.png"}
                   alt={selectedMensagem.nome}
@@ -280,7 +280,7 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
                   className="rounded-full object-cover"
                   unoptimized
                 />
-                <div>
+                <div className="min-w-0 break-words">
                   <p className="font-semibold text-gray-800">{selectedMensagem.nome}</p>
                   <p className="font-medium text-gray-700">{selectedMensagem.titulo}</p>
                   <p className="text-gray-500">{selectedMensagem.descricao}</p>
@@ -336,7 +336,7 @@ export default function MensagensRecebidasContent({ username, userId }: Props) {
               </div>
 
               {/* Ações */}
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end sm:gap-3">
                 <button
                   onClick={handleSaveStatus}
                   className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"

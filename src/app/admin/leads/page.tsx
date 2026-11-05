@@ -43,8 +43,8 @@ export default async function AdminLeadsPage() {
   const companyEmail = process.env.NEXT_PUBLIC_COMPANY_EMAIL || "contato@severinoconstrucoes.pt";
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-zinc-950 px-3 py-5 text-zinc-100 sm:px-5 sm:py-7 2xl:px-8 2xl:py-10">
+      <div className="mx-auto max-w-screen-2xl space-y-6 sm:space-y-8">
         {/* Header Superior com Informações do Administrador */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
           <div>
@@ -53,7 +53,7 @@ export default async function AdminLeadsPage() {
                 <Building2 className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl 2xl:text-3xl">
                   Painel de Orçamentos & Leads
                 </h1>
                 <p className="text-sm text-zinc-400">
@@ -79,7 +79,7 @@ export default async function AdminLeadsPage() {
         </div>
 
         {/* Métricas Rápidas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-4">
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <p className="text-xs uppercase font-bold text-zinc-400 tracking-wider">Total de Orçamentos</p>
             <div className="flex items-baseline justify-between mt-2">
@@ -119,7 +119,7 @@ export default async function AdminLeadsPage() {
 
         {/* Tabela de Leads */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
-          <div className="px-6 py-5 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col justify-between gap-4 border-b border-zinc-800 px-4 py-4 sm:flex-row sm:items-center sm:px-6 sm:py-5">
             <div>
               <h2 className="text-lg font-bold text-white">Solicitações Recebidas ({leads.length})</h2>
               <p className="text-xs text-zinc-400">Listagem completa ordenada da mais recente para a mais antiga</p>
@@ -127,29 +127,59 @@ export default async function AdminLeadsPage() {
           </div>
 
           {leads.length === 0 ? (
-            <div className="p-16 text-center text-zinc-500">
+            <div className="p-8 text-center text-zinc-500 sm:p-16">
               <Building2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-amber-400" />
               <p className="text-base font-semibold text-zinc-400">Nenhum orçamento recebido ainda.</p>
               <p className="text-xs text-zinc-500 mt-1">Os pedidos enviados no formulário do site aparecerão aqui em tempo real.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full min-w-[1050px] text-left text-sm">
                 <thead className="bg-zinc-950/70 text-zinc-400 text-xs font-semibold uppercase tracking-wider border-b border-zinc-800">
                   <tr>
-                    <th className="py-4 px-6">Cliente / Contacto</th>
-                    <th className="py-4 px-6">Tipo de Obra</th>
-                    <th className="py-4 px-6">Visita Sugerida</th>
-                    <th className="py-4 px-6">Pref. Contacto</th>
-                    <th className="py-4 px-6">Descrição do Projeto</th>
-                    <th className="py-4 px-6">Status</th>
-                    <th className="py-4 px-6">Data de Envio</th>
+                    <th className="px-4 py-4 sm:px-6">Cliente / Contacto</th>
+                    <th className="px-4 py-4 sm:px-6">Tipo de Obra</th>
+                    <th className="px-4 py-4 sm:px-6">Visita Sugerida</th>
+                    <th className="px-4 py-4 sm:px-6">Pref. Contacto</th>
+                    <th className="px-4 py-4 sm:px-6">Descrição do Projeto</th>
+                    <th className="px-4 py-4 sm:px-6">Status</th>
+                    <th className="px-4 py-4 sm:px-6">Data de Envio</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60">
                   {leads.map((lead) => {
                     const cleanPhone = lead.phone.replace(/[^0-9]/g, "");
-                    const whatsappLink = `https://wa.me/${cleanPhone}`;
+                    const whatsappPhone = cleanPhone.length === 9
+                      ? `351${cleanPhone}`
+                      : cleanPhone.startsWith("00")
+                        ? cleanPhone.slice(2)
+                        : cleanPhone;
+                    const emailSubject = `Pedido de orçamento: ${lead.subject}`;
+                    const emailBody = [
+                      `Olá, ${lead.name},`,
+                      "",
+                      "Agradecemos o seu contacto e o interesse nos serviços da Severino Remodelações.",
+                      `Recebemos o seu pedido de orçamento para "${lead.subject}" e vamos analisar os detalhes para lhe apresentar uma resposta adequada.`,
+                      lead.preferredDate
+                        ? `Registámos a sua disponibilidade para uma visita em ${lead.preferredDate}${lead.preferredTime ? `, ${lead.preferredTime}` : ""}.`
+                        : "",
+                      "",
+                      "Se tiver fotografias, medidas ou outras informações relevantes, poderá responder a este e-mail.",
+                      "",
+                      "Com os melhores cumprimentos,",
+                      "Equipa Severino Remodelações",
+                    ].filter(Boolean).join("\n");
+                    const whatsappMessage = [
+                      `Olá, ${lead.name}.`,
+                      "",
+                      "Agradecemos o seu pedido de orçamento à Severino Remodelações.",
+                      `Recebemos o seu pedido para "${lead.subject}" e vamos analisar os detalhes para lhe responder o mais brevemente possível.`,
+                      "Se tiver fotografias ou informações adicionais sobre o projeto, pode enviá-las por aqui.",
+                      "",
+                      "Com os melhores cumprimentos,",
+                      "Equipa Severino Remodelações",
+                    ].join("\n");
+                    const whatsappLink = `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`;
 
                     return (
                       <tr key={lead.id} className="hover:bg-zinc-800/40 transition-colors">
@@ -161,26 +191,33 @@ export default async function AdminLeadsPage() {
                           </div>
                           <div className="text-xs text-zinc-400 flex items-center gap-1.5 mt-1">
                             <Mail className="w-3.5 h-3.5 text-zinc-500" />
-                            <a href={`mailto:${lead.email}`} className="hover:text-amber-400 transition-colors">
+                            <a
+                              href={`mailto:${lead.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`}
+                              className="hover:text-amber-400 transition-colors"
+                              title="Responder por e-mail com mensagem sugerida"
+                            >
                               {lead.email}
                             </a>
                           </div>
                           <div className="text-xs text-zinc-400 flex items-center gap-1.5 mt-1">
                             <Phone className="w-3.5 h-3.5 text-zinc-500" />
-                            <a href={`tel:${lead.phone}`} className="hover:text-amber-400 transition-colors">
+                            <a
+                              href={whatsappLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-amber-400 transition-colors"
+                              title="Responder pelo WhatsApp com mensagem sugerida"
+                            >
                               {lead.phone}
                             </a>
                             {lead.isWhatsapp && (
-                              <a
-                                href={whatsappLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium hover:bg-emerald-500/20 transition-colors text-[11px]"
-                                title="Abrir conversa no WhatsApp"
+                              <span
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium text-[11px]"
+                                title="Número indicado como WhatsApp"
                               >
                                 <MessageCircle className="w-3 h-3" />
                                 WhatsApp
-                              </a>
+                              </span>
                             )}
                           </div>
                         </td>

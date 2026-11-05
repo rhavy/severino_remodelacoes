@@ -101,8 +101,8 @@ export function ProjectManager({
   return (
     <div className="space-y-10">
       {/* Formulário de Criação (CRUD - Create) */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8">
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 sm:p-6 2xl:p-8">
+        <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-white sm:text-lg">
           <FolderPlus className="w-5 h-5 text-amber-500" />
           Registar Novo Projeto no Portfólio
         </h3>
@@ -116,7 +116,7 @@ export function ProjectManager({
               placeholder="Ex: /image/obra.jpeg ou https://..."
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full min-w-0 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500 sm:px-4"
             />
           </div>
 
@@ -127,7 +127,7 @@ export function ProjectManager({
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+              className="w-full min-w-0 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer sm:px-4"
             >
               {categories.map((c) => (
                 <option key={c} value={c}>
@@ -141,7 +141,7 @@ export function ProjectManager({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 font-bold text-xs uppercase tracking-wider text-zinc-950 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3 text-xs font-bold uppercase tracking-wider text-zinc-950 transition-all hover:bg-amber-400 disabled:opacity-50 sm:w-auto sm:px-6"
             >
               {isSubmitting ? (
                 <>
@@ -172,7 +172,7 @@ export function ProjectManager({
             <p className="text-xs text-zinc-500 mt-1">Utilize o formulário acima para adicionar novas fotos e categorias de obras.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:gap-6">
             {projects.map((proj) => (
               <div
                 key={proj.id}
@@ -186,7 +186,7 @@ export function ProjectManager({
                     className="object-cover"
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 rounded bg-zinc-950/80 backdrop-blur-md text-[11px] font-bold text-amber-400 uppercase">
+                    <span className="max-w-[80%] truncate rounded bg-zinc-950/80 px-2.5 py-1 text-[11px] font-bold uppercase text-amber-400 backdrop-blur-md">
                       {proj.categoria}
                     </span>
                   </div>

@@ -12,8 +12,11 @@ interface GoalChartProps {
 }
 
 export function GoalChart({ data, label }: GoalChartProps) {
+  const value = data[0]?.value;
+  const percentage = Number.isFinite(value) ? value : 0;
+
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <ResponsiveContainer width="100%" height="100%">
       <RadialBarChart
         innerRadius="80%"
         outerRadius="100%"
@@ -41,7 +44,7 @@ export function GoalChart({ data, label }: GoalChartProps) {
           dominantBaseline="middle"
           className="fill-current text-4xl font-bold text-yellow-500"
         >
-          {`${data[0]?.value.toFixed(0) || 0}%`}
+          {`${percentage.toFixed(0)}%`}
         </text>
         <text
           x="50%"

@@ -81,10 +81,14 @@ export default function DashboardContent({ username }: { username: string }) {
       ]
     : [];
 
-  const pendenteRate = stats ? (stats.mensagensPendentes / stats.totalMensagens) * 100 : 0;
-  const apagadoRate = stats ? (stats.mensagensApagadas / stats.totalMensagens) * 100 : 0;
-  const lidoRate = stats ? (stats.mensagensLidas / stats.totalMensagens) * 100 : 0;
-  const resolvidoRate = stats ? (stats.mensagensResolvidas / stats.totalMensagens) * 100 : 0;
+  const getRate = (count: number) =>
+    stats && stats.totalMensagens > 0
+      ? (count / stats.totalMensagens) * 100
+      : 0;
+  const pendenteRate = getRate(stats?.mensagensPendentes ?? 0);
+  const apagadoRate = getRate(stats?.mensagensApagadas ?? 0);
+  const lidoRate = getRate(stats?.mensagensLidas ?? 0);
+  const resolvidoRate = getRate(stats?.mensagensResolvidas ?? 0);
 
 
   const pendenteChartData = [
@@ -120,9 +124,9 @@ export default function DashboardContent({ username }: { username: string }) {
   ];
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-12">
+    <div className="mx-auto w-full max-w-[1920px] space-y-8 px-3 py-5 sm:space-y-10 sm:px-5 sm:py-7 2xl:space-y-12 2xl:px-10 2xl:py-10">
       {/* Cards de resumo */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 sm:gap-5 2xl:gap-6">
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
               <div
@@ -136,15 +140,15 @@ export default function DashboardContent({ username }: { username: string }) {
           : statCards.map((stat, i) => (
               <motion.div
                 key={i}
-                className="bg-white dark:bg-slate-900 rounded-xl shadow p-6 flex items-center gap-4"
+                className="flex items-center gap-3 rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:gap-4 sm:p-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <div className="p-3 bg-yellow-100 rounded-full">{stat.icon}</div>
                 <div>
-                  <p className="text-gray-400">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-sm text-gray-400 sm:text-base">{stat.title}</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
                     {stat.value}
                   </p>
                 </div>
@@ -153,87 +157,87 @@ export default function DashboardContent({ username }: { username: string }) {
       </div>
 
       {/* Gráficos de Meta */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4 sm:gap-5 2xl:gap-6">
         <motion.section
-          className="bg-white dark:bg-slate-900 rounded-xl shadow p-6"
+          className="min-w-0 rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-xl font-bold text-blue-500 mb-4">
+          <h2 className="mb-3 text-lg font-bold text-blue-500 sm:mb-4 sm:text-xl">
             Taxa de Lidas
           </h2>
           {loading ? (
-            <div className="h-80 bg-gray-100 dark:bg-slate-800 rounded flex items-center justify-center text-gray-400 animate-pulse">
+            <div className="flex h-64 items-center justify-center rounded bg-gray-100 text-center text-sm text-gray-400 animate-pulse dark:bg-slate-800 sm:h-80">
               Carregando gráfico...
             </div>
           ) : (
-            <GoalChart data={lidoChartData} label="Lidas" />
+            <div className="h-64 sm:h-80"><GoalChart data={lidoChartData} label="Lidas" /></div>
           )}
         </motion.section>
 
         <motion.section
-          className="bg-white dark:bg-slate-900 rounded-xl shadow p-6"
+          className="min-w-0 rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h2 className="text-xl font-bold text-green-500 mb-4">
+          <h2 className="mb-3 text-lg font-bold text-green-500 sm:mb-4 sm:text-xl">
             Taxa de Resolvidas
           </h2>
           {loading ? (
-            <div className="h-80 bg-gray-100 dark:bg-slate-800 rounded flex items-center justify-center text-gray-400 animate-pulse">
+            <div className="flex h-64 items-center justify-center rounded bg-gray-100 text-center text-sm text-gray-400 animate-pulse dark:bg-slate-800 sm:h-80">
               Carregando gráfico...
             </div>
           ) : (
-            <GoalChart data={resolvidoChartData} label="Resolvidas" />
+            <div className="h-64 sm:h-80"><GoalChart data={resolvidoChartData} label="Resolvidas" /></div>
           )}
         </motion.section>
         <motion.section
-          className="bg-white dark:bg-slate-900 rounded-xl shadow p-6"
+          className="min-w-0 rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-xl font-bold text-orange-500 mb-4">
+          <h2 className="mb-3 text-lg font-bold text-orange-500 sm:mb-4 sm:text-xl">
             Taxa de Pendentes
           </h2>
           {loading ? (
-            <div className="h-80 bg-gray-100 dark:bg-slate-800 rounded flex items-center justify-center text-gray-400 animate-pulse">
+            <div className="flex h-64 items-center justify-center rounded bg-gray-100 text-center text-sm text-gray-400 animate-pulse dark:bg-slate-800 sm:h-80">
               Carregando gráfico...
             </div>
           ) : (
-            <GoalChart data={pendenteChartData} label="Pendentes" />
+            <div className="h-64 sm:h-80"><GoalChart data={pendenteChartData} label="Pendentes" /></div>
           )}
         </motion.section>
 
         <motion.section
-          className="bg-white dark:bg-slate-900 rounded-xl shadow p-6"
+          className="min-w-0 rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h2 className="text-xl font-bold text-red-500 mb-4">
+          <h2 className="mb-3 text-lg font-bold text-red-500 sm:mb-4 sm:text-xl">
             Taxa de Apagadas
           </h2>
           {loading ? (
-            <div className="h-80 bg-gray-100 dark:bg-slate-800 rounded flex items-center justify-center text-gray-400 animate-pulse">
+            <div className="flex h-64 items-center justify-center rounded bg-gray-100 text-center text-sm text-gray-400 animate-pulse dark:bg-slate-800 sm:h-80">
               Carregando gráfico...
             </div>
           ) : (
-            <GoalChart data={apagadoChartData} label="Apagadas" />
+            <div className="h-64 sm:h-80"><GoalChart data={apagadoChartData} label="Apagadas" /></div>
           )}
         </motion.section>
       </div>
 
       {/* Atividades recentes */}
       <motion.section
-        className="bg-white dark:bg-slate-900 rounded-xl shadow p-6"
+        className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <h2 className="text-xl font-bold text-yellow-600 mb-4">
+        <h2 className="mb-4 text-lg font-bold text-yellow-600 sm:text-xl">
           Atividades Recentes
         </h2>
         <ul className="space-y-3">
@@ -241,7 +245,7 @@ export default function DashboardContent({ username }: { username: string }) {
             ? Array.from({ length: 5 }).map((_, i) => (
                 <li
                   key={i}
-                  className="flex items-center justify-between bg-gray-50 dark:bg-slate-800 p-3 rounded-lg animate-pulse"
+                  className="flex flex-col gap-2 rounded-lg bg-gray-50 p-3 animate-pulse dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-3/4"></div>
                 </li>
@@ -249,14 +253,14 @@ export default function DashboardContent({ username }: { username: string }) {
             : activities.map((act) => (
                 <li
                   key={act.id}
-                  className="flex items-center justify-between bg-gray-50 dark:bg-slate-800 p-3 rounded-lg"
+                  className="flex flex-col gap-2 rounded-lg bg-gray-50 p-3 dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">
                       {act.user.name} {act.acao}
                     </p>
                   </div>
-                  <span className="text-gray-400 text-sm">
+                  <span className="text-left text-sm text-gray-400 sm:shrink-0 sm:text-right">
                     {new Date(act.createdAt).toLocaleDateString("pt-BR", {
                       day: "2-digit",
                       month: "2-digit",

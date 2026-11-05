@@ -140,8 +140,8 @@ export default function GalleryContent({ username }: { username: string }) {
   });
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold text-yellow-600">📸 Galeria de Projetos</h1>
+    <div className="space-y-6 p-3 sm:space-y-8 sm:p-5 2xl:p-8">
+      <h1 className="text-2xl font-bold text-yellow-600 sm:text-3xl">📸 Galeria de Projetos</h1>
 
       {/* Upload + Filtro */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -159,7 +159,7 @@ export default function GalleryContent({ username }: { username: string }) {
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value as Categoria | "Todos" | "Apagado")}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none sm:w-auto"
         >
           {categorias.map((cat) => (
             <option key={cat} value={cat}>
@@ -171,8 +171,8 @@ export default function GalleryContent({ username }: { username: string }) {
 
       {/* Modal Preview */}
       {preview && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-lg space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-6">
+          <div className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-lg space-y-4 overflow-y-auto rounded-lg bg-white p-4 shadow-lg sm:max-h-[calc(100dvh-3rem)] sm:p-6">
             <h2 className="text-lg font-semibold text-gray-700">Pré-visualização da Imagem</h2>
             <Image src={preview} alt="Preview" width={400} height={300} className="object-cover rounded-lg w-full" />
             <div>
@@ -187,7 +187,7 @@ export default function GalleryContent({ username }: { username: string }) {
                 ))}
               </select>
             </div>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
               <button
                 onClick={handleConfirmUpload}
                 className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
@@ -206,7 +206,7 @@ export default function GalleryContent({ username }: { username: string }) {
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:gap-6">
         {filteredGallery.map((item, i) => (
           <motion.div
             key={item.id}
@@ -216,13 +216,13 @@ export default function GalleryContent({ username }: { username: string }) {
             transition={{ duration: 0.3, delay: i * 0.05 }}
           >
             <Image src={item.url} alt={`Imagem ${item.id}`} width={400} height={300} className="object-cover w-full h-60" />
-            <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white text-sm px-3 py-2 flex items-center justify-between">
+            <div className="absolute bottom-0 left-0 flex w-full items-center justify-between gap-2 bg-black/60 px-3 py-2 text-sm text-white">
               {editingId === item.id ? (
-                <div className="flex gap-2 items-center">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <select
                     value={tempCategoria}
                     onChange={(e) => setTempCategoria(e.target.value as Categoria)}
-                    className="text-black rounded px-2 py-1"
+                    className="min-w-0 max-w-full rounded px-2 py-1 text-black"
                   >
                     {categorias.filter((cat) => cat !== "Todos" && cat !== "Apagado").map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>

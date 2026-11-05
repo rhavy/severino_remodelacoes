@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Eye, EyeOff, Loader2, Replace } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,7 +29,7 @@ type SignupFormValues = z.infer<typeof signupSchema>
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
   const router = useRouter()
 
   const form = useForm<SignupFormValues>({
@@ -43,28 +43,47 @@ export function SignupForm() {
   })
 
   async function onSubmit(formData: SignupFormValues) {
+    setErrorMessage("")
 
-    const {} = await authClient.signUp.email({
-      name    : formData.name,
-      email   : formData.email,
-      password: formData.password,
-      callbackURL: '/dashboard'
-    },{
-      onRequest: () => {
-
-      },
-      onSuccess: () => {
-        router.replace('/dashboard');
-      },
-      onError: () => {
-
-      }
-    })
+    try {
+      await authClient.signUp.email(
+        {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+          callbackURL: "/dashboard",
+        },
+        {
+          onSuccess: () => {
+            router.replace("/dashboard")
+          },
+          onError: ({ error }) => {
+            setErrorMessage(
+              error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"
+                ? "Este email já está cadastrado. Faça login ou use outro email."
+                : error.code === "SERVER_ERROR"
+                  ? "O serviço de cadastro está indisponível. Verifique a conexão com o banco de dados e tente novamente."
+                  : "Não foi possível criar a conta. Verifique os dados e tente novamente."
+            )
+          },
+        }
+      )
+    } catch (error) {
+      console.error("Erro ao criar conta:", error)
+      setErrorMessage("Não foi possível criar a conta. Verifique sua conexão e tente novamente.")
+    }
   }
+
+  const isSubmitting = form.formState.isSubmitting
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {errorMessage && (
+          <p role="alert" className="text-sm text-destructive">
+            {errorMessage}
+          </p>
+        )}
         <FormField
           control={form.control}
           name="name"
@@ -72,7 +91,7 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="Seu nome completo" {...field} disabled={isLoading} />
+                <Input placeholder="Seu nome completo" {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +105,7 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="seu@email.com" type="email" {...field} disabled={isLoading} />
+                <Input placeholder="seu@email.com" type="email" {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,7 +124,7 @@ export function SignupForm() {
                     placeholder="••••••••"
                     type={showPassword ? "text" : "password"}
                     {...field}
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   />
                   <Button
                     type="button"
@@ -113,7 +132,7 @@ export function SignupForm() {
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +160,7 @@ export function SignupForm() {
                     placeholder="••••••••"
                     type={showConfirmPassword ? "text" : "password"}
                     {...field}
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   />
                   <Button
                     type="button"
@@ -149,7 +168,7 @@ export function SignupForm() {
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -165,8 +184,8 @@ export function SignupForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {form.formState.isSubmitting ? (
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Cadastrando...

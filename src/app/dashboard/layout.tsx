@@ -17,12 +17,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <LanguageProvider showPreferencePrompt={false}>
-      <div className="flex min-h-screen bg-gray-50 dark:bg-slate-900">
+      <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-slate-900 md:flex-row">
         {/* Sidebar */}
         <MenuAdmin menuLinks={menuLinks} isOpen={isOpen} setIsOpen={setIsOpen} />
 
         {/* Conteúdo principal */}
-        <main className={`${isOpen ? "ml-64" : "ml-16"} flex-1 transition-all duration-300`}>
+        <main className={`${isOpen ? "lg:ml-64" : "lg:ml-16"} min-w-0 flex-1 transition-all duration-300`}>
           {children}
         </main>
       </div>

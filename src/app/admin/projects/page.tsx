@@ -10,9 +10,9 @@ export default async function AdminProjectsPage() {
   });
 
   return (
-    <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-screen-2xl space-y-6 p-3 sm:space-y-8 sm:p-5 2xl:p-10">
       <div className="pb-6 border-b border-zinc-800">
-        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+        <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl 2xl:text-3xl">
           Gestão de Projetos & Portfólio (CRUD)
         </h1>
         <p className="text-sm text-zinc-400 mt-1">

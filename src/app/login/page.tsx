@@ -12,7 +12,7 @@ export default async function loginPage() {
      const session = await auth.api.getSession({
           headers: await headers()
       })
-      if (session && session?.user.emailVerified === true) {
+      if (session?.user) {
           redirect("/dashboard");
         }
     
@@ -42,7 +42,11 @@ export default async function loginPage() {
                 <p className="mt-2 text-sm text-muted-foreground">Entre com suas credenciais para acessar sua conta</p>
               </div>
       
-              <LoginForm/>
+              <LoginForm
+                googleEnabled={Boolean(
+                  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+                )}
+              />
       
               <div className="text-center text-sm">
                 <p>

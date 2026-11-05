@@ -46,7 +46,7 @@ export default async function Signup() {
           <div className="text-center text-sm">
             <p>
               Já tem uma conta?{" "}
-              <Link href="/loginAdmin" className="font-medium text-primary hover:underline">
+              <Link href="/login" className="font-medium text-primary hover:underline">
                 Faça login
               </Link>
             </p>

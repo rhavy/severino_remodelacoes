@@ -8,8 +8,8 @@ export default async function GalleryPage() {
   const session = await auth.api.getSession({
         headers: await headers()
       })
-      if (!session || !session?.user.emailVerified === true) {
-        redirect("/");
+      if (!session?.user) {
+        redirect("/login");
       }
 
   return <GalleryContent username={session.user.name} />;

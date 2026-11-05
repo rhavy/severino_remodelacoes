@@ -27,10 +27,11 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-export function LoginForm() {
+export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
   const router = useRouter()
 
   const form = useForm<LoginFormValues>({
@@ -43,29 +44,33 @@ export function LoginForm() {
 
   async function onSubmit(formData: LoginFormValues) {
     setIsLoading(true)
+    setErrorMessage("")
 
     try {
       await authClient.signIn.email(
         {
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
           callbackURL: "/dashboard"
         },
         {
-          onRequest: () => {},
           onSuccess: () => {
             router.replace("/dashboard")
           },
-          onError: (ctx) => {
-            if (ctx.error.code === "INVALID_EMAIL_OR_PASSWORD") {
-              alert("Utilizador ou palavra-passe inválidos!")
-            }
+          onError: ({ error }) => {
+            setErrorMessage(
+              error.code === "INVALID_EMAIL_OR_PASSWORD"
+                ? "Email ou senha inválidos."
+                : error.code === "SERVER_ERROR"
+                  ? "O serviço de autenticação está indisponível. Verifique a conexão com o banco de dados e tente novamente."
+                  : "Não foi possível entrar. Verifique os dados e tente novamente."
+            )
           }
         }
       )
     } catch (err) {
       console.error("Erro ao autenticar:", err)
-      alert("Erro inesperado ao tentar entrar.")
+      setErrorMessage("Não foi possível entrar. Verifique sua conexão e tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -73,14 +78,15 @@ export function LoginForm() {
 
   async function handleSignInWithGoogle() {
     setIsLoadingGoogle(true)
+    setErrorMessage("")
     try {
       await authClient.signIn.social({
         provider: "google",
         callbackURL: "/dashboard"
       })
     } catch (err) {
-      // console.error("Erro ao entrar com Google:", err)
-      alert("Erro ao entrar com Google. Tente novamente.")
+      console.error("Erro ao entrar com Google:", err)
+      setErrorMessage("Não foi possível entrar com Google. Tente novamente.")
     }finally {
       setIsLoadingGoogle(false)
     }
@@ -89,6 +95,11 @@ export function LoginForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {errorMessage && (
+          <p role="alert" className="text-sm text-destructive">
+            {errorMessage}
+          </p>
+        )}
         <FormField
           control={form.control}
           name="email"
@@ -157,33 +168,40 @@ export function LoginForm() {
           )}
         </Button>
 
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Ou continue com
-            </span>
-          </div>
-        </div>
+        {googleEnabled && (
+          <>
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Ou continue com
+                </span>
+              </div>
+            </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full bg-yellow-600 text-white hover:bg-yellow-700 hover:text-white"
-          onClick={handleSignInWithGoogle} disabled={isLoadingGoogle}>
-          {isLoadingGoogle ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Entrando...
-            </>
-          ) :( <>
-                <GoogleLogo className="mr-2 h-4 w-4" />
-                Entrar com Google
-              </>)
-          }
-        </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-yellow-600 text-white hover:bg-yellow-700 hover:text-white"
+              onClick={handleSignInWithGoogle}
+              disabled={isLoadingGoogle}
+            >
+              {isLoadingGoogle ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                <>
+                  <GoogleLogo className="mr-2 h-4 w-4" />
+                  Entrar com Google
+                </>
+              )}
+            </Button>
+          </>
+        )}
       </form>
     </Form>
   )
