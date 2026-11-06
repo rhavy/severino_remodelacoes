@@ -2,261 +2,342 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Upload, Trash2, Check, X, Pencil, RotateCcw } from "lucide-react";
+import {
+  Check,
+  Eye,
+  EyeOff,
+  FolderPlus,
+  Image as ImageIcon,
+  Loader2,
+  Pencil,
+  Plus,
+  X,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
-type Categoria =
-  | "Residencial"
-  | "Comercial"
-  | "Industrial"
-  | "Reformas"
-  | "Construções"
-  | "Acabamentos"
-  | "Manutenção Predial";
-
 type ItemGaleria = {
-  id: string; // 🔹 Agora string
+  id: string;
+  title: string;
+  category: string;
+  location: string;
+  image: string;
+  description: string;
+  userId: string | null;
   url: string;
-  categoria: Categoria;
-  oculta?: boolean;
+  categoria: string;
+  oculta: boolean;
 };
 
-export default function GalleryContent({ username }: { username: string }) {
+const categories = [
+  "Residencial",
+  "Comercial",
+  "Industrial",
+  "Reformas",
+  "Construções",
+  "Acabamentos",
+  "Manutenção Predial",
+  "Reformas Gerais",
+  "Construção de Raiz",
+  "Remodelação de Interiores",
+  "Reabilitação de Fachadas",
+  "Pinturas & Acabamentos",
+  "Impermeabilizações",
+];
+
+const inputClassName =
+  "w-full min-w-0 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30";
+
+export default function GalleryContent() {
   const [gallery, setGallery] = useState<ItemGaleria[]>([]);
-  const [filter, setFilter] = useState<Categoria | "Todos" | "Apagado">("Todos");
-  const [preview, setPreview] = useState<string | null>(null);
+  const [filter, setFilter] = useState("Todos");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState(categories[0]);
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [tempCategoria, setTempCategoria] = useState<Categoria>("Residencial");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const categorias: (Categoria | "Todos" | "Apagado")[] = [
-    "Todos",
-    "Residencial",
-    "Comercial",
-    "Industrial",
-    "Reformas",
-    "Construções",
-    "Acabamentos",
-    "Manutenção Predial",
-    "Apagado",
-  ];
-
-  // Buscar galeria ao carregar
   useEffect(() => {
-    fetch("/api/galeria")
-      .then((res) => res.json())
-      .then((data) => setGallery(data))
-      .catch((err) => console.error("Erro ao buscar galeria:", err));
+    const controller = new AbortController();
+
+    async function loadGallery() {
+      try {
+        const response = await fetch("/api/galeria?admin=1", { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error("Não foi possível carregar os projetos da galeria.");
+        }
+        setGallery(await response.json());
+      } catch (loadError) {
+        if (!controller.signal.aborted) {
+          setError(loadError instanceof Error ? loadError.message : "Erro ao carregar a galeria.");
+        }
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+
+    loadGallery();
+    return () => controller.abort();
   }, []);
 
-  // Selecionar arquivo
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.length) return;
-    const selected = e.target.files[0];
-    setFile(selected);
-    setPreview(URL.createObjectURL(selected));
-    setTempCategoria("Residencial");
-  };
-
-  // Confirmar upload (POST)
-  const handleConfirmUpload = async () => {
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("categoria", tempCategoria);
-
-    try {
-      const res = await fetch("/api/galeria", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Erro ao salvar imagem");
-      const nova: ItemGaleria = await res.json();
-      setGallery((prev) => [nova, ...prev]);
-      setPreview(null);
-      setFile(null);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Cancelar upload
-  const handleCancelUpload = () => {
-    setPreview(null);
+  const resetForm = () => {
+    setTitle("");
+    setCategory(categories[0]);
+    setLocation("");
+    setDescription("");
     setFile(null);
+    setEditingId(null);
   };
 
-  // Ocultar / Restaurar
-  const handleToggleOculta = async (id: string, isDelete: boolean) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    const formData = new FormData();
+    formData.set("title", title.trim());
+    formData.set("category", category);
+    formData.set("location", location.trim());
+    formData.set("description", description.trim());
+    if (file) formData.set("file", file);
+    if (editingId) formData.set("id", editingId);
+
     try {
-      const res = await fetch(`/api/galeria`, {
-        method: "DELETE",
-        body: JSON.stringify({ id, delete: isDelete }), // enviar a flag para o backend
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch("/api/galeria", {
+        method: editingId ? "PATCH" : "POST",
+        body: formData,
       });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Não foi possível guardar o projeto.");
+      }
 
-      if (!res.ok) throw new Error("Erro ao atualizar status");
-      const updated: ItemGaleria = await res.json();
-
-      setGallery((prev) =>
-        prev.map((item) => (item.id === id ? updated : item))
+      const savedItem = result as ItemGaleria;
+      setGallery((current) =>
+        editingId
+          ? current.map((item) => (item.id === savedItem.id ? savedItem : item))
+          : [savedItem, ...current]
       );
-    } catch (err) {
-      console.error(err);
+      resetForm();
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Erro ao guardar o projeto.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-
-  // Editar categoria existente
-  const handleEdit = (id: string, categoria: Categoria) => {
-    setEditingId(id);
-    setTempCategoria(categoria);
+  const handleEdit = (item: ItemGaleria) => {
+    setEditingId(item.id);
+    setTitle(item.title);
+    setCategory(item.category);
+    setLocation(item.location);
+    setDescription(item.description);
+    setFile(null);
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Salvar edição (PATCH)
-  const handleSaveEdit = async (id: string) => {
-    const formData = new FormData();
-    formData.append("id", id);
-    formData.append("categoria", tempCategoria);
-    if (file) formData.append("file", file);
-
+  const handleToggleVisibility = async (item: ItemGaleria) => {
+    setError(null);
     try {
-      const res = await fetch(`/api/galeria`, { method: "PATCH", body: formData });
-      if (!res.ok) throw new Error("Erro ao editar imagem");
-      const atualizado: ItemGaleria = await res.json();
-
-      setGallery((prev) =>
-        prev.map((item) => (item.id === id ? atualizado : item))
-      );
-      setEditingId(null);
-      setFile(null);
-      setPreview(null);
-    } catch (err) {
-      console.error(err);
+      const response = await fetch("/api/galeria", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id, delete: !item.oculta }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Não foi possível alterar a visibilidade.");
+      setGallery((current) => current.map((entry) => entry.id === item.id ? result : entry));
+    } catch (toggleError) {
+      setError(toggleError instanceof Error ? toggleError.message : "Erro ao alterar a visibilidade.");
     }
   };
 
   const filteredGallery = gallery.filter((item) => {
     if (filter === "Todos") return !item.oculta;
     if (filter === "Apagado") return item.oculta;
-    return item.categoria === filter;
+    return item.category === filter;
   });
+  const filterOptions = ["Todos", ...new Set(gallery.map((item) => item.category)), "Apagado"];
 
   return (
-    <div className="space-y-6 p-3 sm:space-y-8 sm:p-5 2xl:p-8">
-      <h1 className="text-2xl font-bold text-yellow-600 sm:text-3xl">📸 Galeria de Projetos</h1>
-
-      {/* Upload + Filtro */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <label className="flex items-center gap-3 px-4 py-2 bg-yellow-500 text-white font-medium rounded-lg cursor-pointer hover:bg-yellow-600 transition">
-          <Upload size={18} />
-          <span>Selecionar Imagem</span>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-        </label>
-
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as Categoria | "Todos" | "Apagado")}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none sm:w-auto"
-        >
-          {categorias.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+    <div className="mx-auto max-w-screen-2xl space-y-6 p-3 sm:space-y-8 sm:p-5 2xl:p-8">
+      <div>
+        <h1 className="text-2xl font-bold text-yellow-600 sm:text-3xl">Galeria de Projetos</h1>
+        <p className="mt-1 text-sm text-zinc-400">
+          Registe os detalhes das obras para apresentar no portfólio público.
+        </p>
       </div>
 
-      {/* Modal Preview */}
-      {preview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-6">
-          <div className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-lg space-y-4 overflow-y-auto rounded-lg bg-white p-4 shadow-lg sm:max-h-[calc(100dvh-3rem)] sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-700">Pré-visualização da Imagem</h2>
-            <Image src={preview} alt="Preview" width={400} height={300} className="object-cover rounded-lg w-full" />
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Categoria</label>
-              <select
-                value={tempCategoria}
-                onChange={(e) => setTempCategoria(e.target.value as Categoria)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
-              >
-                {categorias.filter((cat) => cat !== "Todos" && cat !== "Apagado").map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
-              <button
-                onClick={handleConfirmUpload}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-              >
-                <Check size={18} /> Confirmar
-              </button>
-              <button
-                onClick={handleCancelUpload}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-              >
-                <X size={18} /> Cancelar
-              </button>
-            </div>
-          </div>
+      {error && (
+        <div role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {error}
         </div>
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:gap-6">
-        {filteredGallery.map((item, i) => (
-          <motion.div
-            key={item.id}
-            className="relative rounded-lg overflow-hidden shadow group"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: i * 0.05 }}
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 sm:p-6">
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-semibold text-white">
+          <FolderPlus className="h-5 w-5 text-amber-500" />
+          {editingId ? "Editar projeto" : "Adicionar projeto"}
+        </h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="space-y-1.5 text-xs font-semibold text-zinc-300">
+            Título
+            <input
+              required
+              maxLength={191}
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Ex.: Remodelação de apartamento"
+              className={inputClassName}
+            />
+          </label>
+
+          <label className="space-y-1.5 text-xs font-semibold text-zinc-300">
+            Categoria
+            <select
+              required
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className={inputClassName}
+            >
+              {categories.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </label>
+
+          <label className="space-y-1.5 text-xs font-semibold text-zinc-300">
+            Localização
+            <input
+              required
+              maxLength={500}
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="Ex.: Lisboa, Portugal"
+              className={inputClassName}
+            />
+          </label>
+
+          <label className="space-y-1.5 text-xs font-semibold text-zinc-300">
+            Imagem {editingId ? "(opcional para manter a atual)" : ""}
+            <input
+              required={!editingId}
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              className={`${inputClassName} file:mr-3 file:rounded-md file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:font-semibold file:text-zinc-950`}
+            />
+            <span className="block font-normal text-zinc-500">PNG ou JPEG, até 5 MB.</span>
+          </label>
+
+          <label className="space-y-1.5 text-xs font-semibold text-zinc-300 sm:col-span-2">
+            Descrição
+            <textarea
+              required
+              maxLength={5000}
+              rows={4}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="Descreva os principais detalhes do projeto."
+              className={inputClassName}
+            />
+          </label>
+
+          <div className="flex flex-col-reverse gap-2 sm:col-span-2 sm:flex-row sm:justify-end">
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-300 hover:bg-zinc-800"
+              >
+                <X className="h-4 w-4" /> Cancelar edição
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-amber-500 px-5 py-2 text-sm font-bold text-zinc-950 hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : editingId ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {isSubmitting ? "A guardar..." : editingId ? "Guardar alterações" : "Adicionar projeto"}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-bold text-white">Projetos registados ({filteredGallery.length})</h2>
+          <select
+            aria-label="Filtrar projetos por categoria"
+            value={filter}
+            onChange={(event) => setFilter(event.target.value)}
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-white sm:w-auto"
           >
-            <Image src={item.url} alt={`Imagem ${item.id}`} width={400} height={300} className="object-cover w-full h-60" />
-            <div className="absolute bottom-0 left-0 flex w-full items-center justify-between gap-2 bg-black/60 px-3 py-2 text-sm text-white">
-              {editingId === item.id ? (
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <select
-                    value={tempCategoria}
-                    onChange={(e) => setTempCategoria(e.target.value as Categoria)}
-                    className="min-w-0 max-w-full rounded px-2 py-1 text-black"
+            {filterOptions.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </div>
+
+        {loading ? (
+          <p className="py-10 text-center text-sm text-zinc-400">A carregar projetos...</p>
+        ) : filteredGallery.length === 0 ? (
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8 text-center text-zinc-400 sm:p-12">
+            <ImageIcon className="mx-auto mb-3 h-10 w-10 text-amber-500 opacity-50" />
+            <p className="font-semibold">Nenhum projeto nesta categoria.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 sm:gap-6">
+            {filteredGallery.map((item, index) => (
+              <motion.article
+                key={item.id}
+                className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 shadow"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: index * 0.03 }}
+              >
+                <div className="relative h-52 bg-zinc-950">
+                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <span className="absolute left-3 top-3 max-w-[80%] truncate rounded bg-zinc-950/85 px-2.5 py-1 text-[11px] font-bold uppercase text-amber-400">
+                    {item.category}
+                  </span>
+                  {item.oculta && (
+                    <span className="absolute right-3 top-3 rounded bg-red-500/90 px-2 py-1 text-[10px] font-bold uppercase text-white">
+                      Oculto
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-2 p-4">
+                  <h3 className="font-semibold text-white">{item.title}</h3>
+                  <p className="text-xs font-medium text-amber-400">{item.location}</p>
+                  <p className="line-clamp-3 whitespace-pre-line text-sm leading-relaxed text-zinc-400">
+                    {item.description}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-800 p-3">
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(item)}
+                    className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-700"
                   >
-                    {categorias.filter((cat) => cat !== "Todos" && cat !== "Apagado").map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <button onClick={() => handleSaveEdit(item.id)} className="bg-green-500 text-white px-2 py-1 rounded">
-                    <Check size={14} />
+                    <Pencil className="h-3.5 w-3.5" /> Editar
                   </button>
-                  <button onClick={() => setEditingId(null)} className="bg-red-500 text-white px-2 py-1 rounded">
-                    <X size={14} />
+                  <button
+                    type="button"
+                    onClick={() => handleToggleVisibility(item)}
+                    className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-700"
+                  >
+                    {item.oculta
+                      ? <><Eye className="h-3.5 w-3.5 text-amber-400" /> Publicar</>
+                      : <><EyeOff className="h-3.5 w-3.5 text-zinc-400" /> Ocultar</>}
                   </button>
                 </div>
-              ) : (
-                <>
-                  <span>{item.categoria}</span>
-                  <button onClick={() => handleEdit(item.id, item.categoria)} className="opacity-0 group-hover:opacity-100 transition">
-                    <Pencil size={16} />
-                  </button>
-                </>
-              )}
-            </div>
-
-            <button
-              onClick={() => handleToggleOculta(item.id, !item.oculta)}
-              className={`absolute top-3 right-3 p-2 rounded-full opacity-0 group-hover:opacity-100 transition ${
-                item.oculta ? "bg-green-500 text-white" : "bg-red-500 text-white"
-              }`}
-            >
-              {item.oculta ? <RotateCcw size={16} /> : <Trash2 size={16} />}
-            </button>
-
-          </motion.div>
-        ))}
-      </div>
+              </motion.article>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

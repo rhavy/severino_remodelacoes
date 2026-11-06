@@ -7,6 +7,7 @@ export default async function AdminProjectsPage() {
   // Buscar itens de portfólio/galeria salvos no banco de dados
   const projects = await prisma.galeria.findMany({
     orderBy: { createdAt: "desc" },
+    include: { user: { select: { name: true } } },
   });
 
   return (
@@ -16,7 +17,7 @@ export default async function AdminProjectsPage() {
           Gestão de Projetos & Portfólio (CRUD)
         </h1>
         <p className="text-sm text-zinc-400 mt-1">
-          Adicione, edite, oculte e remova projetos que compõem o catálogo de obras da Severino Remodelações
+          Adicione, edite, oculte e exclua projetos sem os remover definitivamente do banco de dados.
         </p>
       </div>
 

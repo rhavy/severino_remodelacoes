@@ -1,0 +1,2 @@
+ALTER TABLE `Galeria`
+  ADD COLUMN `excluido` BOOLEAN NOT NULL DEFAULT false;

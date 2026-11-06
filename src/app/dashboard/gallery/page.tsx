@@ -12,5 +12,5 @@ export default async function GalleryPage() {
         redirect("/login");
       }
 
-  return <GalleryContent username={session.user.name} />;
+  return <GalleryContent />;
 }
